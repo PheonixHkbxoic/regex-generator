@@ -1,0 +1,32 @@
+# Build Artifacts 
+.gradle/
+build/
+target/
+catalog/
+dependency-reduced-pom.xml
+log/
+
+# generated files
+bin/
+gen/
+
+# Eclipse Project Files
+.project
+.classpath
+.settings/
+
+
+# IntelliJ IDEA Files
+*.iml
+*.ipr
+*.iws
+*.idea
+
+
+# Java class files
+*.class
+*.jar
+
+
+*.log
+*.zip
