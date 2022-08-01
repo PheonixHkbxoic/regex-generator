@@ -158,7 +158,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
             }
         }
 
-        return this.parseSuccess();
+        return true;
     }
 
     private ReturnBreak parseNumbers() {

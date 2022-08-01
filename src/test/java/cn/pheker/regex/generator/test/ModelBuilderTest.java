@@ -42,9 +42,9 @@ public class ModelBuilderTest {
 //        targets.add("<div id = abc > 123");
 //        targets.add("\"abc'123\"");
 //        targets.add("'name':'zhangsan'");
-        targets.add("'name':'zhangsan',abc");
-        targets.add("'name': zhangsan,abc");
-        targets.add("{'name':1}");
+//        targets.add("'name':'zhangsan',abc");
+//        targets.add("'name': zhangsan,abc");
+        targets.add("{a:{b:1}");
         return targets;
     }
     
