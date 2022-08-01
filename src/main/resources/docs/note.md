@@ -44,7 +44,6 @@ public class X {
     public boolean parse(Lexer lexer) {
         Token token;
         while (lexer.hasNext()) {
-            log.debug("token: {}", token);
             switch (token.getType()) {
                 // 边界或非边界处理
             }

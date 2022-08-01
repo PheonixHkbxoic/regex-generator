@@ -39,7 +39,9 @@ public class KeyValue extends AbstractComposite {
         Token token;
         OUTER:
         while ((token = lexer.read()) != Token.EOF) {
-            log.debug("token: {}", token);
+            if (log.isDebugEnabled()) {
+                log.debug("token: {}", token);
+            }
             TokenType type = token.getType();
             switch (type) {
                 case LessThan:

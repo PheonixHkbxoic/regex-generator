@@ -1,6 +1,6 @@
 package cn.pheker.regex.generator.util;
 
-import com.sun.istack.internal.NotNull;
+import cn.pheker.regex.generator.core.annotation.NotNull;
 
 /**
  * @author cn.pheker

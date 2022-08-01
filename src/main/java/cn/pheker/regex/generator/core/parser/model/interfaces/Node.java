@@ -1,10 +1,10 @@
 package cn.pheker.regex.generator.core.parser.model.interfaces;
 
+import cn.pheker.regex.generator.core.annotation.NotNull;
 import cn.pheker.regex.generator.core.lexer.TokenType;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
 import cn.pheker.regex.generator.core.parser.model.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
-import com.sun.istack.internal.NotNull;
 
 /**
  * @author cn.pheker
