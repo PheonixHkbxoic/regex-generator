@@ -91,9 +91,10 @@ public class Lexer {
     }
     
     private boolean needMerge(Token curr) {
-        return curr.type == TokenType.DIGIT
-                || curr.type == TokenType.Lower
-                || curr.type == TokenType.Upper;
+        return false;
+//        return curr.type == TokenType.DIGIT
+//                || curr.type == TokenType.Lower
+//                || curr.type == TokenType.Upper;
     }
     
     /**

@@ -14,4 +14,10 @@ public interface Last<T> {
      * @return 最后一个元素
      */
     T getLast();
+
+    /**
+     * 删除最后一个
+     * @return 存在并删除返回true, 否则返回false
+     **/
+    boolean removeLast();
 }

@@ -22,8 +22,4 @@ public class Sequence extends AbstractComposite {
         return StrUtil.times(this.getDeep()) + "Sequence{" + children + '}';
     }
     
-    @Override
-    public boolean parseSuccess() {
-        return true;
-    }
 }

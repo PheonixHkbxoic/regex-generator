@@ -1,4 +1,6 @@
+
 [TOC]
+
 
 ## 父子递归调用
 场景: 文本解析生成节点树  
@@ -11,10 +13,13 @@
     所以子类处理完后要返还给父类,父类再返还给子类,子类再返回父类,就处理完毕了
     2. 非边界 自己处理
 * 子类 
-    1. 接收开始边界
-    2. 把递归开始边界交给父类
-    3. 处理结束边界 再返还控制权给父类
-    4. 非边界交给父类处理
+  1. 接收开始边界
+  2. 把递归开始边界交给父类
+  3. 处理结束边界 再返还控制权给父类
+  4. 非边界交给父类处理
+  5. 特殊情况
+  子类要处理的字符比较有限,有太多结束边界不好处理, 此时可以不把控制权给父类,自己处理即可
+  典型的情况如: 标识符,数字
     
 综上所述:
 > 总控制权在父类, 负责在遇到边界时下发控制权, 也能处理非边界;  
@@ -35,12 +40,14 @@
 ### 通用递归
 父子类都要实现parse方法
 ```java
-public boolean parse(Lexer lexer) {
-    Token token;
-    while (lexer.hasNext()) {
-        log.debug("token: {}", token);
-        switch (token.getType()) {
-            // 边界或非边界处理
+public class X {
+    public boolean parse(Lexer lexer) {
+        Token token;
+        while (lexer.hasNext()) {
+            log.debug("token: {}", token);
+            switch (token.getType()) {
+                // 边界或非边界处理
+            }
         }
     }
 }

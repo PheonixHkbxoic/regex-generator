@@ -30,21 +30,21 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
      * 多选一
      */
     protected boolean alternative;
-    
+
     public AbstractComposite(NonLeaf parent) {
         super(parent);
     }
-    
+
     @Override
     public void setAlternative() {
         this.alternative = true;
     }
-    
+
     @Override
     public boolean isAlternative() {
         return alternative;
     }
-    
+
     @Override
     public void setParent(NonLeaf parent) {
         super.setParent(parent);
@@ -55,23 +55,23 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
             }
         }
     }
-    
+
     @Override
     public boolean parseSuccess() {
-        return true;
+        return !children().isEmpty();
     }
-    
+
     @Override
     public void recall() {
         for (int lastIndex = children.size() - 1; lastIndex >= 0; lastIndex--) {
             children.get(lastIndex).recall();
         }
     }
-    
+
     @Override
     public boolean parse() {
         Lexer lexer = context.getLexer();
-        
+
         Token token;
         while ((token = lexer.read()) != Token.EOF) {
             log.debug("token: {}", token);
@@ -89,7 +89,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                 case OpenBracket:
                     parsePair(new Array(this));
                     break;
-                
+
                 case GreaterThan:
                 case CloseParenthesis:
                 case CloseBrace:
@@ -98,7 +98,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                         this.add(Single.of(this));
                     }
                     return true;
-                
+
                 case DoubleQuote:
                 case Apostrophe:
                     ReturnBreak rb = parseStrings();
@@ -115,16 +115,34 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                 case Underscore:
                 case Upper:
                 case Lower:
+                case DIGIT:
                     ReturnBreak id = parseId();
                     if (id.isBreak()) {
                         break;
                     }
+
+                    // 数字
                     if (id.isFalse()) {
-                        this.add(Single.of(this));
+                        parseNumbers();
                         break;
                     }
                     return true;
+                case Dot:
+                    final DotX dotX = new DotX(this);
+                    if (!dotX.parse()) {
+                        this.add(Single.of(this));
+                        break;
+                    }
+                    this.add(dotX);
+                    break;
 
+                case Plus:
+                case Minus:
+                    final ReturnBreak rbn = parseNumbers();
+                    if (rbn.isReturn()) {
+                        return rbn.isTrue();
+                    }
+                    break;
                 default:
                     this.add(Single.of(this));
                     // K ::= ":"[Blank]V | "="[Blank]V
@@ -139,11 +157,23 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                     break;
             }
         }
-        
+
         return this.parseSuccess();
     }
 
-    protected ReturnBreak parseId(){
+    private ReturnBreak parseNumbers() {
+        final Numbers numbers = new Numbers(this);
+        if (!numbers.parse()) {
+            numbers.recall();
+            this.add(Single.of(this));
+        }else{
+            this.add(numbers);
+        }
+
+        return ReturnBreak.ofBreak();
+    }
+
+    protected ReturnBreak parseId() {
         Lexer lexer = context.getLexer();
         Token token = lexer.read();
         TokenType type = token.getType();
@@ -157,7 +187,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         id.parse();
         this.add(id);
 
-        return ReturnBreak.ofTrue();
+        return ReturnBreak.ofBreak();
     }
 
     private void parsePair(Node pair) {
@@ -168,8 +198,8 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         pair.recall();
         this.add(Single.of(this));
     }
-    
-    
+
+
     private ReturnBreak parseStrings() {
         Lexer lexer = context.getLexer();
         Token token = lexer.read();
@@ -184,14 +214,14 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                     && context.contains(this.parent, DoubleQuote)) {
                 return ReturnBreak.ofFalse();
             }
-            
+
             // 开始标志在父类
             if (context.contains(this.parent, type)) {
                 this.add(Single.of(this));
                 return ReturnBreak.ofTrue();
             }
         }
-        
+
         if (!context.contains(this, type)) {
             context.add(this, type);
             Strings strings = new Strings(this, token.isTokenType(TokenType.DoubleQuote));
@@ -214,5 +244,5 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         }
         return ReturnBreak.ofTrue();
     }
-    
+
 }

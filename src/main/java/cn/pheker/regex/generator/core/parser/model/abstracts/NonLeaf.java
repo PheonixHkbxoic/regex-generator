@@ -53,7 +53,7 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
     }
     
     public int size() {
-        return children.size();
+        return children == null ? 0 : children.size();
     }
     
     @Override
@@ -61,7 +61,16 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
         return children == null || children.isEmpty() ? null
                 : children.get(size() - 1);
     }
-    
+
+    @Override
+    public boolean removeLast(){
+        if (children == null || children.isEmpty()) {
+            return false;
+        }
+        children.remove(children.size() - 1);
+        return true;
+    }
+
     public List<Node> children() {
         return children == null ? new ArrayList<>() : children;
     }

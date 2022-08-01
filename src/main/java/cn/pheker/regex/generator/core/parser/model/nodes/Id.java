@@ -32,11 +32,11 @@ public class Id extends AbstractComposite {
                 case Underscore:
                 case Upper:
                 case Lower:
+                case DIGIT:
                     // 出口
                     this.add(Single.of(this));
                     break;
                 default:
-                    // 其它无效节点
                     // 出口
                     break OUTER;
             }
