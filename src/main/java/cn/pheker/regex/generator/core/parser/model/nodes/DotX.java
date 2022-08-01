@@ -7,6 +7,8 @@ import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
 
 import static cn.pheker.regex.generator.core.lexer.Token.EOF;
+import static cn.pheker.regex.generator.core.lexer.TokenType.DIGIT;
+import static cn.pheker.regex.generator.core.lexer.TokenType.Dot;
 
 /**
  * @author cn.pheker
@@ -31,12 +33,12 @@ public class DotX extends AbstractComposite {
                 case Lower:
                 case DIGIT:
                     final Node last = getLast();
-                    // 第一个就是数字则按小数处理
-//                    if (last.isLeafTokenType(TokenType.Dot) && token.isTokenType(TokenType.DIGIT)) {
-//                        this.add(Single.of(this));
-//                        break;
-//                    }
-
+//                     第一个就是数字则按小数处理
+                    if (last.isLeafTokenType(Dot) && token.isTokenType(DIGIT)) {
+                        super.parse();
+                        break;
+                    }
+        
                     // 第一个非数字  按id处理
                     final Id id = new Id(this);
                     id.parse();

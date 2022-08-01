@@ -48,12 +48,10 @@ public class Numbers extends Sequence {
             case Plus:
                 sign = TrueFalseElse.ofTrue();
                 this.add(Single.of(this));
-                first = lexer.next();
                 break;
             case Minus:
                 sign = TrueFalseElse.ofFalse();
                 this.add(Single.of(this));
-                first = lexer.next();
                 break;
             default:
                 sign = TrueFalseElse.ofElse();
@@ -159,6 +157,7 @@ public class Numbers extends Sequence {
             this.removeLast();
             return true;
         }
+        this.add(Single.of(this));
         return true;
     }
 
@@ -186,12 +185,6 @@ public class Numbers extends Sequence {
         Token curr;
         while ((curr = lexer.read()) != Token.EOF) {
             if (!checkValid(curr)) {
-                // TODO 细化
-                if (curr.getTok().equals(".")) {
-                    hasDecimal = true;
-                    this.add(Single.of(this));
-                    continue;
-                }
                 return true;
             }
             this.add(Single.of(this));
