@@ -66,6 +66,13 @@ public interface Node {
      * 当解析失败时, 要手动调用此方法进行回溯
      */
     void recall();
+
+    /**
+     * 判断当前对象是否是某一类节点
+     **/
+    default boolean isExtendsOf(Class<? extends Node> clzz){
+        return clzz.isAssignableFrom(this.getClass());
+    }
     
     /**
      * 判断是否是叶子节点且tokenType为types之一

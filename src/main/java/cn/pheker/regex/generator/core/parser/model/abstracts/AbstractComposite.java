@@ -110,6 +110,21 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                         break;
                     }
                     return true;
+
+                case Dollar:
+                case Underscore:
+                case Upper:
+                case Lower:
+                    ReturnBreak id = parseId();
+                    if (id.isBreak()) {
+                        break;
+                    }
+                    if (id.isFalse()) {
+                        this.add(Single.of(this));
+                        break;
+                    }
+                    return true;
+
                 default:
                     this.add(Single.of(this));
                     // K ::= ":"[Blank]V | "="[Blank]V
@@ -127,7 +142,24 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         
         return this.parseSuccess();
     }
-    
+
+    protected ReturnBreak parseId(){
+        Lexer lexer = context.getLexer();
+        Token token = lexer.read();
+        TokenType type = token.getType();
+
+        // 开头是数字, 则不能作为标识符
+        if (!isExtendsOf(Id.class) && token.isTokenType(DIGIT)) {
+            return ReturnBreak.ofFalse();
+        }
+
+        Id id = new Id(this);
+        id.parse();
+        this.add(id);
+
+        return ReturnBreak.ofTrue();
+    }
+
     private void parsePair(Node pair) {
         if (pair.parse()) {
             this.add(pair);
