@@ -1,4 +1,4 @@
-package cn.pheker.regex.generator.core.parser.model.abstracts;
+package cn.pheker.regex.generator.core.parser.abstracts;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
@@ -63,13 +63,12 @@ public abstract class Leaf extends AbstractNode {
     
     @Override
     public String printFormatted() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(StrUtil.times(getDeep()))
-                .append(this.getClass().getSimpleName())
-                .append("  ")
-                .append(token)
-                .append('\n');
-        return sb.toString();
+        String sb = StrUtil.times(getDeep()) +
+                this.getClass().getSimpleName() +
+                "  " +
+                token +
+                '\n';
+        return sb;
     }
 
     @Override

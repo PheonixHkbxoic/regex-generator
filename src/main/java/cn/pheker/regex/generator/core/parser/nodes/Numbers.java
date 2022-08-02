@@ -1,8 +1,9 @@
-package cn.pheker.regex.generator.core.parser.model.nodes;
+package cn.pheker.regex.generator.core.parser.nodes;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.other.NumberType;
 import cn.pheker.regex.generator.misc.TrueFalseElse;
 
 import static cn.pheker.regex.generator.core.lexer.TokenType.*;
@@ -66,7 +67,7 @@ public class Numbers extends Sequence {
         // 八进制      0123
         // 二进制      0b
         // 十六进制    0x
-        if (first.getTok().equals("0")) {
+        if ("0".equals(first.getTok())) {
             // 0
             children.add(Single.of(this));
             Token next = lexer.read();
@@ -83,7 +84,7 @@ public class Numbers extends Sequence {
                 numberType = NumberType.Octal;
                 parseOctal();
             } else {
-                if (tok.equalsIgnoreCase("b")) {
+                if ("b".equalsIgnoreCase(tok)) {
                     numberType = NumberType.Binary;
                     final Single b = Single.of(this);
                     this.add(b);
@@ -91,7 +92,7 @@ public class Numbers extends Sequence {
                         b.recall();
                         this.removeLast();
                     }
-                } else if (tok.equalsIgnoreCase("x")) {
+                } else if ("x".equalsIgnoreCase(tok)) {
                     numberType = NumberType.Hexadecimal;
                     final Single x = Single.of(this);
                     this.add(x);
@@ -114,7 +115,7 @@ public class Numbers extends Sequence {
         final Lexer lexer = context.getLexer();
         Token curr;
         while ((curr = lexer.read()) != Token.EOF) {
-            if (!checkValid(curr)) {
+            if (isInvalid(curr)) {
                 return;
             }
             this.add(Single.of(this));
@@ -130,14 +131,14 @@ public class Numbers extends Sequence {
         }
 
         // 0-f
-        if (!checkValid(first)) {
+        if (isInvalid(first)) {
             return false;
         }
         final Single firstNode = Single.of(this);
         this.add(firstNode);
 
         Token second = lexer.read();
-        if (!checkValid(second)) {
+        if (isInvalid(second)) {
             firstNode.recall();
             this.removeLast();
             return false;
@@ -145,14 +146,14 @@ public class Numbers extends Sequence {
         this.add(Single.of(this));
 
         Token third = lexer.read();
-        if (!checkValid(third)) {
+        if (isInvalid(third)) {
             return true;
         }
         final Single thirdNode = Single.of(this);
         this.add(thirdNode);
 
         Token forth = lexer.read();
-        if (!checkValid(forth)) {
+        if (isInvalid(forth)) {
             thirdNode.recall();
             this.removeLast();
             return true;
@@ -170,7 +171,7 @@ public class Numbers extends Sequence {
 
         Token curr;
         while ((curr = lexer.read()) != Token.EOF) {
-            if (!checkValid(curr)) {
+            if (isInvalid(curr)) {
                 return true;
             }
             lexer.next();
@@ -184,29 +185,29 @@ public class Numbers extends Sequence {
         final Lexer lexer = context.getLexer();
         Token curr;
         while ((curr = lexer.read()) != Token.EOF) {
-            if (!checkValid(curr)) {
+            if (isInvalid(curr)) {
                 return true;
             }
             this.add(Single.of(this));
         }
         return true;
     }
-
-
-    private boolean checkValid(Token token) {
+    
+    
+    private boolean isInvalid(Token token) {
         if (token.isTokenType(EOF)) {
-            return false;
+            return true;
         }
         final String tok = token.getTok();
         switch (numberType) {
             case Binary:
-                return tok.matches("[01]");
+                return !tok.matches("[01]");
             case Octal:
-                return tok.matches("[0-7]");
+                return !tok.matches("[0-7]");
             case Hexadecimal:
-                return tok.matches("[0-9a-fA-F]");
+                return !tok.matches("[0-9a-fA-F]");
             default:
-                return tok.matches("[0-9]");
+                return !tok.matches("[0-9]");
         }
     }
 }

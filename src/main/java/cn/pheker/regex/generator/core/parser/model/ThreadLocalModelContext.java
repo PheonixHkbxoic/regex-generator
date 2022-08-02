@@ -2,7 +2,7 @@ package cn.pheker.regex.generator.core.parser.model;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.TokenType;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
 
 import java.util.HashSet;
 import java.util.Set;

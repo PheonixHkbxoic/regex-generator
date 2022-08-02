@@ -1,9 +1,9 @@
 package cn.pheker.regex.generator.core.parser;
 
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.interfaces.Strategy;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelIterator;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.strategy.Strategy;
 
 import java.util.HashMap;
 import java.util.Iterator;

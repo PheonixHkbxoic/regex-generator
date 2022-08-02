@@ -1,11 +1,11 @@
-package cn.pheker.regex.generator.core.parser.model.nodes;
+package cn.pheker.regex.generator.core.parser.nodes;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
 import cn.pheker.regex.generator.core.lexer.TokenType;
-import cn.pheker.regex.generator.core.parser.model.abstracts.AbstractComposite;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.abstracts.AbstractComposite;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -39,9 +39,7 @@ public class KeyValue extends AbstractComposite {
         Token token;
         OUTER:
         while ((token = lexer.read()) != Token.EOF) {
-            if (log.isDebugEnabled()) {
-                log.debug("token: {}", token);
-            }
+            //log.debug("token: {}", token);
             TokenType type = token.getType();
             switch (type) {
                 case LessThan:

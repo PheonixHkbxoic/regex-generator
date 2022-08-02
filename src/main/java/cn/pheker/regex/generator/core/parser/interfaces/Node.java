@@ -1,10 +1,10 @@
-package cn.pheker.regex.generator.core.parser.model.interfaces;
+package cn.pheker.regex.generator.core.parser.interfaces;
 
 import cn.pheker.regex.generator.core.annotation.NotNull;
 import cn.pheker.regex.generator.core.lexer.TokenType;
+import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
-import cn.pheker.regex.generator.core.parser.model.abstracts.Leaf;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
 
 import java.util.List;
 

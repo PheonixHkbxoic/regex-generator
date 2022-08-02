@@ -1,4 +1,4 @@
-package cn.pheker.regex.generator.core.parser.model.interfaces;
+package cn.pheker.regex.generator.core.parser.interfaces;
 
 /**
  * @author cn.pheker

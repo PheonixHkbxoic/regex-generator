@@ -1,7 +1,7 @@
-package cn.pheker.regex.generator.core.parser.model.abstracts;
+package cn.pheker.regex.generator.core.parser.abstracts;
 
-import cn.pheker.regex.generator.core.parser.model.interfaces.Last;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.interfaces.Last;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.exception.TooManyRegex;
 import cn.pheker.regex.generator.util.StrUtil;
 
@@ -121,8 +121,8 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
             return second;
         }
         return first.stream()
-                .flatMap(prefix-> second
-                        .stream().map(suffix -> prefix.concat(suffix)))
+                .flatMap(prefix -> second
+                        .stream().map(prefix::concat))
                 .collect(Collectors.toList());
     }
 }

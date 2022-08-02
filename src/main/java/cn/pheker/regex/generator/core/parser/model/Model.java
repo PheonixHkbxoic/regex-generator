@@ -1,9 +1,9 @@
 package cn.pheker.regex.generator.core.parser.model;
 
 import cn.hutool.core.util.StrUtil;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.model.nodes.Root;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.nodes.Root;
 import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringScanner;
 

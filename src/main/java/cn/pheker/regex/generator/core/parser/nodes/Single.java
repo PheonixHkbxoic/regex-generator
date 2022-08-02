@@ -1,7 +1,7 @@
-package cn.pheker.regex.generator.core.parser.model.nodes;
+package cn.pheker.regex.generator.core.parser.nodes;
 
-import cn.pheker.regex.generator.core.parser.model.abstracts.Leaf;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 
 /**
  * @author cn.pheker

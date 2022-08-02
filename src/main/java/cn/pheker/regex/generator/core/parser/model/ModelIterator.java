@@ -1,7 +1,5 @@
 package cn.pheker.regex.generator.core.parser.model;
 
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
-
 import java.util.Iterator;
 import java.util.List;
 

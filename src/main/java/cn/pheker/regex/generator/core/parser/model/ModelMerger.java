@@ -1,6 +1,6 @@
 package cn.pheker.regex.generator.core.parser.model;
 
-import cn.pheker.regex.generator.core.parser.model.nodes.Root;
+import cn.pheker.regex.generator.core.parser.nodes.Root;
 import lombok.extern.slf4j.Slf4j;
 
 /**

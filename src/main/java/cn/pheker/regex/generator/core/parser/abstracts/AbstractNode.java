@@ -1,7 +1,7 @@
-package cn.pheker.regex.generator.core.parser.model.abstracts;
+package cn.pheker.regex.generator.core.parser.abstracts;
 
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
 
 /**
  * @author cn.pheker

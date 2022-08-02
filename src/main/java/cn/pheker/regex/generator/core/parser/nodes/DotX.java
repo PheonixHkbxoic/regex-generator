@@ -1,10 +1,9 @@
-package cn.pheker.regex.generator.core.parser.model.nodes;
+package cn.pheker.regex.generator.core.parser.nodes;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
-import cn.pheker.regex.generator.core.parser.model.abstracts.AbstractComposite;
-import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
 
 import static cn.pheker.regex.generator.core.lexer.Token.EOF;
 import static cn.pheker.regex.generator.core.lexer.TokenType.DIGIT;
@@ -15,11 +14,11 @@ import static cn.pheker.regex.generator.core.lexer.TokenType.Dot;
  * @version 1.0
  * @date 2022/8/1 15:07
  */
-public class DotX extends AbstractComposite {
+public class DotX extends Sequence {
     public DotX(NonLeaf parent) {
         super(parent);
     }
-
+    
     @Override
     public boolean parse() {
         add(Single.of(this));

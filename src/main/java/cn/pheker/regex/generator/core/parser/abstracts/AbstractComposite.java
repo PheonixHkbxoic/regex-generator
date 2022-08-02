@@ -1,11 +1,11 @@
-package cn.pheker.regex.generator.core.parser.model.abstracts;
+package cn.pheker.regex.generator.core.parser.abstracts;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
 import cn.pheker.regex.generator.core.lexer.TokenType;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Alternative;
-import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.model.nodes.*;
+import cn.pheker.regex.generator.core.parser.interfaces.Alternative;
+import cn.pheker.regex.generator.core.parser.interfaces.Node;
+import cn.pheker.regex.generator.core.parser.nodes.*;
 import cn.pheker.regex.generator.misc.ReturnBreak;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,9 +74,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
 
         Token token;
         while ((token = lexer.read()) != Token.EOF) {
-            if (log.isDebugEnabled()) {
-                log.debug("token: {}", token);
-            }
+            //log.debug("token: {}", token);
             TokenType type = token.getType();
             switch (type) {
                 case LessThan:
