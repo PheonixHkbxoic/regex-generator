@@ -113,7 +113,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                     }
                     return true;
 
-                case Dollar:
+//                case Dollar:
                 case Underscore:
                 case Upper:
                 case Lower:

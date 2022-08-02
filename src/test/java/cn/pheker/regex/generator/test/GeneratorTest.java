@@ -1,5 +1,6 @@
 package cn.pheker.regex.generator.test;
 
+import cn.pheker.regex.generator.core.parser.Generator;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
 import cn.pheker.regex.generator.core.parser.model.ModelIterator;
@@ -19,16 +20,17 @@ import java.util.Iterator;
 
 @RunWith(JUnit4.class)
 @Slf4j
-public class ModelIteratorTest {
+public class GeneratorTest {
 
     @Test
-    public void testModelIterator() {
+    public void testGenerator() {
         final String text = "<div>abc</div>";
         StringScanner scanner = new StringScanner(text);
         ModelBuilder builder = ModelBuilder.build(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model);
-        final Iterator<String> regexIte = model.iterator();
+        final Generator gen = Generator.of(model);
+        final Iterator<String> regexIte = gen.iterator();
         if (!regexIte.hasNext()) {
             log.error("testModelIterator-errorMsg: {}", ((ModelIterator) regexIte).getErrorMsg());
             return;

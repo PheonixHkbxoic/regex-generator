@@ -30,7 +30,7 @@ public class Id extends AbstractComposite {
             }
             TokenType type = token.getType();
             switch (type) {
-                case Dollar:
+//                case Dollar:
                 case Underscore:
                 case Upper:
                 case Lower:

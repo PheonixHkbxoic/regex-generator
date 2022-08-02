@@ -27,7 +27,7 @@ public class DotX extends AbstractComposite {
         Token token;
         if ((token = lexer.read()) != EOF) {
             switch (token.getType()) {
-                case Dollar:
+//                case Dollar:
                 case Underscore:
                 case Upper:
                 case Lower:

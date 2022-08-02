@@ -12,18 +12,13 @@ import java.util.List;
  * 模型迭代器
  */
 public class ModelIterator implements Iterator<String>{
-    private Node node;
     private List<String> regex;
     private String errorMsg;
     private int cursor = 0;
 
-    public ModelIterator(Node node) {
-        this.node = node;
-        try {
-            this.regex = this.node.generateRegex();
-        } catch (Exception e) {
-            this.errorMsg = e.getMessage();
-        }
+    public ModelIterator(List<String> regex, String errorMsg) {
+        this.regex = regex;
+        this.errorMsg = errorMsg;
     }
 
     @Override

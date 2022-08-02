@@ -8,7 +8,6 @@ import cn.pheker.regex.generator.core.scanner.Scanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
  * @date 2022/7/27 0:17
  * @desc
  */
-public class Model implements Iterable<String>{
+public class Model{
     Root root = new Root();
     
     /**
@@ -67,11 +66,11 @@ public class Model implements Iterable<String>{
     }
 
 
-    @Override
-    public Iterator<String> iterator() {
-        return new ModelIterator(root);
-    }
-
+    /**
+     * 根据节点id查找节点
+     *
+     * @return 对应的节点
+     **/
     public Node search(String nodeId) {
         if (StrUtil.isEmpty(nodeId)) {
             return null;
