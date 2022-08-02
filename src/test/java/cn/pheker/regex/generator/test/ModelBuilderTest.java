@@ -24,7 +24,7 @@ public class ModelBuilderTest {
     public void testTargets() {
         for (String str : targets()) {
             StringScanner scanner = new StringScanner(str);
-            ModelBuilder builder = ModelBuilder.build(scanner);
+            ModelBuilder builder = ModelBuilder.of(scanner);
             Model model = builder.buildModel();
             log.info("model: {}", model);
         }
@@ -54,8 +54,8 @@ public class ModelBuilderTest {
         String path = ResourceUtil.getResourcePath("google_index.html");
         TxtLinesScanner scanner = new TxtLinesScanner();
         scanner.setFilePath(path);
-        
-        ModelBuilder builder = ModelBuilder.build(scanner);
+    
+        ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model);
     }
@@ -65,8 +65,8 @@ public class ModelBuilderTest {
         String path = ResourceUtil.getResourcePath("runoob.json");
         TxtLinesScanner scanner = new TxtLinesScanner();
         scanner.setFilePath(path);
-        
-        ModelBuilder builder = ModelBuilder.build(scanner);
+    
+        ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model);
     }

@@ -1,6 +1,7 @@
 package cn.pheker.regex.generator.core.parser.model;
 
 import cn.pheker.regex.generator.core.scanner.Scanner;
+import cn.pheker.regex.generator.core.scanner.StringScanner;
 import cn.pheker.regex.generator.exception.ParseException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,22 +19,28 @@ public class ModelBuilder {
         return model;
     }
     
-    public static ModelBuilder build(Scanner scanner) {
+    public static ModelBuilder of(String text) {
         ModelBuilder builder = new ModelBuilder();
         builder.model = new Model();
-        return builder.proofread(scanner);
+        return builder.build(new StringScanner(text));
     }
     
-    private ModelBuilder proofread(Scanner scanner) {
+    public static ModelBuilder of(Scanner scanner) {
+        ModelBuilder builder = new ModelBuilder();
+        builder.model = new Model();
+        return builder.build(scanner);
+    }
+    
+    private ModelBuilder build(Scanner scanner) {
         ModelContext mc = ModelContext.of(scanner);
-        return proofread(mc);
+        return build(model, mc);
     }
     
-    private ModelBuilder proofread(ModelContext context) {
-        return doProofread(model, context);
+    private ModelBuilder build(ModelContext context) {
+        return build(model, context);
     }
     
-    private ModelBuilder doProofread(Model model, ModelContext mc) {
+    private ModelBuilder build(Model model, ModelContext mc) {
         if (!model.proofread(mc)) {
             throw new ParseException("解析失败");
         }

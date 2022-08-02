@@ -2,7 +2,6 @@ package cn.pheker.regex.generator.test.nodes;
 
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
-import cn.pheker.regex.generator.core.scanner.StringScanner;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -30,8 +29,7 @@ public class IdTest {
     @Test
     public void testId() {
         final String text = rg.generate();
-        final StringScanner scanner = new StringScanner(text);
-        final Model model = ModelBuilder.build(scanner).buildModel();
+        final Model model = ModelBuilder.of(text).buildModel();
         log.info("testId-text: {}, 模型如下:{}", text, model);
     }
 

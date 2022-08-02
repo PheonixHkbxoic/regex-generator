@@ -5,6 +5,7 @@ import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.model.nodes.Root;
 import cn.pheker.regex.generator.core.scanner.Scanner;
+import cn.pheker.regex.generator.core.scanner.StringScanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,17 +18,28 @@ import java.util.stream.Collectors;
  * @date 2022/7/27 0:17
  * @desc
  */
-public class Model{
+public class Model {
     Root root = new Root();
+    ModelMerger merger;
+    
+    public Model() {
+        this.merger = new ModelMerger(this);
+    }
     
     /**
      * 应用过的模型上下文列表
      */
     List<ModelContext> contextList = new ArrayList<>();
+    
     /**
-     * 当前模型上下文
+     * 通过文本校正模型
+     *
+     * @param text 文本
+     * @return 校正成功或失败
      */
-    ThreadLocalModelContext tlmc;
+    public boolean proofread(String text) {
+        return this.proofread(new StringScanner(text));
+    }
     
     /**
      * 通过扫描器 校正模型
@@ -47,15 +59,18 @@ public class Model{
      * @return 校正成功或失败
      */
     public boolean proofread(ModelContext mc) {
-        this.tlmc = ThreadLocalModelContext.of(mc);
-        this.root.setContext(tlmc);
-        boolean flag = root.parse();
-        if (flag) {
-            this.contextList.add(mc);
-            this.tlmc = null;
+        ThreadLocalModelContext tlmc = ThreadLocalModelContext.of(mc);
+        Root other = new Root();
+        other.setContext(tlmc);
+        boolean success = other.parse();
+        if (success) {
+            if (merger.merge(other)) {
+                this.contextList.add(mc);
+            }
         }
-        return flag;
+        return success;
     }
+    
     
     @Override
     public String toString() {
@@ -64,8 +79,8 @@ public class Model{
                         "============================================================================",
                 root.printFormatted());
     }
-
-
+    
+    
     /**
      * 根据节点id查找节点
      *
@@ -75,29 +90,25 @@ public class Model{
         if (StrUtil.isEmpty(nodeId)) {
             return null;
         }
-        final List<Integer> indices = Arrays.asList(nodeId.split("-")).stream()
+        final List<Integer> indices = Arrays.stream(nodeId.split("-"))
                 .map(Integer::valueOf)
                 .collect(Collectors.toList());
-        Integer index = indices.remove(0);
+        indices.remove(0);
         if (indices.isEmpty()) {
             return root;
         }
         Node curr = root;
+        Integer index;
         while (!indices.isEmpty()) {
             index = indices.remove(0);
             if (curr.isExtendsOf(NonLeaf.class)) {
                 curr = ((NonLeaf) curr).children().get(index);
-            }else {
+            } else {
                 curr = null;
                 break;
             }
         }
-
-        // 非法nodeId
-        if (curr == null) {
-            return null;
-        }
+    
         return curr;
     }
-
 }

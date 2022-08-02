@@ -26,7 +26,7 @@ public class GeneratorTest {
     public void testGenerator() {
         final String text = "<div>abc</div>";
         StringScanner scanner = new StringScanner(text);
-        ModelBuilder builder = ModelBuilder.build(scanner);
+        ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model);
         final Generator gen = Generator.of(model);

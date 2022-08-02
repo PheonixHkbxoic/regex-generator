@@ -2,7 +2,6 @@ package cn.pheker.regex.generator.test.nodes;
 
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
-import cn.pheker.regex.generator.core.scanner.StringScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +23,7 @@ public class NumbersTest {
     @Test
     public void testNumbers() {
         for (String str : targets()) {
-            StringScanner scanner = new StringScanner(str);
-            ModelBuilder builder = ModelBuilder.build(scanner);
+            ModelBuilder builder = ModelBuilder.of(str);
             Model model = builder.buildModel();
             log.info("model: {}", model);
         }
