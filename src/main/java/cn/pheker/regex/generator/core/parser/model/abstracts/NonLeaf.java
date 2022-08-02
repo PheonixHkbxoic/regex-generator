@@ -2,11 +2,13 @@ package cn.pheker.regex.generator.core.parser.model.abstracts;
 
 import cn.pheker.regex.generator.core.parser.model.interfaces.Last;
 import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
+import cn.pheker.regex.generator.exception.TooManyRegex;
 import cn.pheker.regex.generator.util.StrUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author cn.pheker
@@ -96,5 +98,31 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
                 .append("}")
                 .append('\n');
         return sb.toString();
+    }
+
+    @Override
+    public List<String> generateRegex() {
+        List<String> regex = null;
+        for (Node child : children()) {
+            regex = cartesian(regex, child.generateRegex());
+            if (regex.size() > 10000) {
+                throw new TooManyRegex();
+            }
+        }
+        return regex;
+    }
+
+    /**
+     * 迪卡尔积
+     * @return 迪卡尔积
+     **/
+    protected List<String> cartesian(List<String> first, List<String> second) {
+        if (first == null || first.isEmpty()) {
+            return second;
+        }
+        return first.stream()
+                .flatMap(prefix-> second
+                        .stream().map(suffix -> prefix.concat(suffix)))
+                .collect(Collectors.toList());
     }
 }

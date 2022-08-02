@@ -6,6 +6,8 @@ import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
 import cn.pheker.regex.generator.core.parser.model.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
 
+import java.util.List;
+
 /**
  * @author cn.pheker
  * @version 1.0.0
@@ -13,6 +15,26 @@ import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
  * @desc
  */
 public interface Node {
+    /**
+     * 获取节点唯一标识
+     * @return 节点唯一标识
+     **/
+    default String getId(){
+        if (isRoot()) {
+            return "0";
+        }
+        int indexInParentChildren = getParent().children().indexOf(this);
+        return getParent().getId() + "-" + indexInParentChildren;
+    }
+
+    /**
+     * 获取节点名称
+     * @return 节点名称
+     **/
+    default String getName(){
+        return this.getClass().getSimpleName();
+    }
+
     /**
      * 获取父节点
      *
@@ -110,4 +132,11 @@ public interface Node {
     boolean parseSuccess();
     
     String printFormatted();
+
+
+    /**
+     * 生成正则
+     * @return 生成的正则列表
+     **/
+    List<String> generateRegex();
 }

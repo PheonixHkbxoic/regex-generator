@@ -1,10 +1,16 @@
 package cn.pheker.regex.generator.core.parser.model;
 
+import cn.hutool.core.util.StrUtil;
+import cn.pheker.regex.generator.core.parser.model.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.model.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.model.nodes.Root;
 import cn.pheker.regex.generator.core.scanner.Scanner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author cn.pheker
@@ -12,7 +18,7 @@ import java.util.List;
  * @date 2022/7/27 0:17
  * @desc
  */
-public class Model {
+public class Model implements Iterable<String>{
     Root root = new Root();
     
     /**
@@ -59,6 +65,40 @@ public class Model {
                         "============================================================================",
                 root.printFormatted());
     }
-    
-    
+
+
+    @Override
+    public Iterator<String> iterator() {
+        return new ModelIterator(root);
+    }
+
+    public Node search(String nodeId) {
+        if (StrUtil.isEmpty(nodeId)) {
+            return null;
+        }
+        final List<Integer> indices = Arrays.asList(nodeId.split("-")).stream()
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+        Integer index = indices.remove(0);
+        if (indices.isEmpty()) {
+            return root;
+        }
+        Node curr = root;
+        while (!indices.isEmpty()) {
+            index = indices.remove(0);
+            if (curr.isExtendsOf(NonLeaf.class)) {
+                curr = ((NonLeaf) curr).children().get(index);
+            }else {
+                curr = null;
+                break;
+            }
+        }
+
+        // 非法nodeId
+        if (curr == null) {
+            return null;
+        }
+        return curr;
+    }
+
 }
