@@ -19,7 +19,7 @@ import static cn.pheker.regex.generator.core.lexer.TokenType.*;
  * @desc
  */
 @Slf4j
-public class KeyValue extends AbstractComposite {
+public class KeyValue extends Sequence {
     protected Node key;
     protected Node value;
     protected Token separator;

@@ -18,15 +18,24 @@ import java.util.Map;
  */
 public class Generator implements Iterable<String> {
     private Model model;
-    Strategy strategy;
+    private GeneratorConfig config;
+
     private Map<String, List<String>> nodeRegexListCache = new HashMap<>(1);
 
     public static Generator of(Model model) {
-        return new Generator(model);
+        return of(model, null);
     }
 
-    public Generator(Model model) {
+    public static Generator of(Model model, GeneratorConfig config) {
+        return new Generator(model, config);
+    }
+
+    public Generator(Model model, GeneratorConfig config) {
         this.model = model;
+        this.config = config;
+        if (config == null) {
+            this.config = new GeneratorConfig();
+        }
     }
 
 

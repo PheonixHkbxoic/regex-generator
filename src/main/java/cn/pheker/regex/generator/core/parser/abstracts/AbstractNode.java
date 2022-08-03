@@ -1,5 +1,6 @@
 package cn.pheker.regex.generator.core.parser.abstracts;
 
+import cn.pheker.regex.generator.core.parser.MetaInfo;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
 
@@ -11,7 +12,7 @@ import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
  */
 public abstract class AbstractNode implements Node {
     protected NonLeaf parent;
-    
+
     public AbstractNode(NonLeaf parent) {
         this.setParent(parent);
     }
@@ -33,22 +34,25 @@ public abstract class AbstractNode implements Node {
     protected ThreadLocalModelContext context;
     
     /**
-     * 系数
+     * 元数据
      */
-    protected float coefficient = 0.5f;
+    protected MetaInfo metaInfo;
+
+    @Override
+    public MetaInfo getMetaInfo(){
+        return this.metaInfo;
+    }
+
+    @Override
+    public void setMetaInfo(MetaInfo metaInfo) {
+        this.metaInfo = metaInfo;
+    }
     
     /**
      * 节点深度
      */
     protected int deep = 0;
-    
-    public float getCoefficient() {
-        return coefficient;
-    }
-    
-    public void setCoefficient(float coefficient) {
-        this.coefficient = coefficient;
-    }
+
     
     @Override
     public NonLeaf getParent() {

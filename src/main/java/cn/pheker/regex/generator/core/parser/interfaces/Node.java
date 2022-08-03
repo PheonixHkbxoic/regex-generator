@@ -2,6 +2,7 @@ package cn.pheker.regex.generator.core.parser.interfaces;
 
 import cn.pheker.regex.generator.core.annotation.NotNull;
 import cn.pheker.regex.generator.core.lexer.TokenType;
+import cn.pheker.regex.generator.core.parser.MetaInfo;
 import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
@@ -69,6 +70,19 @@ public interface Node {
      * @return 上下文
      */
     ThreadLocalModelContext getContext();
+
+
+    /**
+     * 获取元数据
+     * @return 元数据
+     **/
+    MetaInfo getMetaInfo();
+
+    /**
+     * 设置元数据
+     * @param metaInfo 元数据
+     **/
+    void setMetaInfo(MetaInfo metaInfo);
     
     /**
      * 获取节点深度
