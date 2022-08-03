@@ -1,6 +1,7 @@
 package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.model.Model;
+import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,8 @@ public class ModelProofreadTest {
         String text = "<p>abc</p>";
         boolean proofread = model.proofread(text);
         log.info("after: {}", model);
+        Branches result = model.result();
+        log.info("merge result: {}", result);
     }
     
     

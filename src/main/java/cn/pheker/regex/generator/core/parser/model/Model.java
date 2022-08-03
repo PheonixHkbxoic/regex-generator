@@ -3,7 +3,8 @@ package cn.pheker.regex.generator.core.parser.model;
 import cn.hutool.core.util.StrUtil;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.nodes.Root;
+import cn.pheker.regex.generator.core.parser.nodes.Branches;
+import cn.pheker.regex.generator.core.parser.nodes.Sequence;
 import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringScanner;
 
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * @desc
  */
 public class Model {
-    Root root = new Root();
+    Sequence root = new Sequence(null);
     ModelMerger merger;
     
     public Model() {
@@ -60,13 +61,12 @@ public class Model {
      */
     public boolean proofread(ModelContext mc) {
         ThreadLocalModelContext tlmc = ThreadLocalModelContext.of(mc);
-        Root other = new Root();
+        Sequence other = new Sequence(null);
         other.setContext(tlmc);
         boolean success = other.parse();
         if (success) {
-            if (merger.merge(other)) {
-                this.contextList.add(mc);
-            }
+            merger.merge(other);
+            this.contextList.add(mc);
         }
         return success;
     }
@@ -110,5 +110,9 @@ public class Model {
         }
     
         return curr;
+    }
+    
+    public Branches result() {
+        return merger.getContainer();
     }
 }

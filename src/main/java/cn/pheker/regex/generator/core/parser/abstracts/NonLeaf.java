@@ -32,6 +32,7 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
     }
     
     public void add(Node child) {
+        child.setParent(this);
         children.add(child);
     }
     
