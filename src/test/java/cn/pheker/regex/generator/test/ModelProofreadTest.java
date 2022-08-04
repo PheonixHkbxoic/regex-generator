@@ -2,7 +2,6 @@ package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
 import cn.pheker.regex.generator.core.parser.model.Model;
-import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * @author wanghaijun
+ * @author cn.pheker
  * @version 1.0.0
  * @date 2022/8/2 21:46
  * @desc 测试模型修正

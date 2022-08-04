@@ -1,7 +1,7 @@
 package cn.pheker.regex.generator.core.parser.interfaces;
 
 /**
- * @author wanghj
+ * @author cn.pheker
  * @version 1.0
  * @date 2022/8/4 16:55
  * 深度格式化, 一般用于树形结构 结点格式化

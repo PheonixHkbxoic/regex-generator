@@ -4,7 +4,7 @@ import cn.pheker.regex.generator.core.parser.other.Mode;
 import lombok.Data;
 
 /**
- * @author wanghj
+ * @author cn.pheker
  * @version 1.0
  * @date 2022/8/3 14:11
  * 生成器配置

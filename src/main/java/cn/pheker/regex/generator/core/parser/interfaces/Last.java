@@ -1,7 +1,7 @@
 package cn.pheker.regex.generator.core.parser.interfaces;
 
 /**
- * @author wanghaijun
+ * @author cn.pheker
  * @version 1.0.0
  * @date 2022/7/30 21:02
  * @desc 获取最后一个元素

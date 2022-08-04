@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author wanghj
+ * @author cn.pheker
  * @version 1.0
  * @date 2022/8/2 10:19
  * 模型迭代器

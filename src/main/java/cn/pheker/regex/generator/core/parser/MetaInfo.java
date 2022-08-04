@@ -3,7 +3,7 @@ package cn.pheker.regex.generator.core.parser;
 import lombok.Data;
 
 /**
- * @author wanghj
+ * @author cn.pheker
  * @version 1.0
  * @date 2022/8/3 14:12
  */
