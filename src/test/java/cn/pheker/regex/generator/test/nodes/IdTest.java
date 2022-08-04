@@ -30,7 +30,7 @@ public class IdTest {
     public void testId() {
         final String text = rg.generate();
         final Model model = ModelBuilder.of(text).buildModel();
-        log.info("testId-text: {}, 模型如下:{}", text, model);
+        log.info("testId-text: {}, 模型如下:{}", text, model.format());
     }
 
 }

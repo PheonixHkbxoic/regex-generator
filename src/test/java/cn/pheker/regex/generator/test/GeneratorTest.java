@@ -28,7 +28,7 @@ public class GeneratorTest {
         StringScanner scanner = new StringScanner(text);
         ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
-        log.info("model: {}", model);
+        log.info("model: {}", model.format());
         final Generator gen = Generator.of(model);
         final Iterator<String> regexIte = gen.iterator();
         if (!regexIte.hasNext()) {

@@ -2,8 +2,9 @@ package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
+import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringScanner;
-import cn.pheker.regex.generator.core.scanner.TxtLinesScanner;
+import cn.pheker.regex.generator.core.scanner.TxtScanner;
 import cn.pheker.regex.generator.util.ResourceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class ModelBuilderTest {
             StringScanner scanner = new StringScanner(str);
             ModelBuilder builder = ModelBuilder.of(scanner);
             Model model = builder.buildModel();
-            log.info("model: {}", model);
+            log.info("model: {}", model.format());
         }
     }
     
@@ -51,24 +52,20 @@ public class ModelBuilderTest {
     
     @Test
     public void testFullHtml() {
-        String path = ResourceUtil.getResourcePath("google_index.html");
-        TxtLinesScanner scanner = new TxtLinesScanner();
-        scanner.setFilePath(path);
-    
+        final String path = ResourceUtil.getResourcePath("google_index.html");
+        Scanner scanner = new TxtScanner(path);
         ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
-        log.info("model: {}", model);
+        log.info("model: {}", model.format());
     }
     
     @Test
     public void testFullJson() {
-        String path = ResourceUtil.getResourcePath("runoob.json");
-        TxtLinesScanner scanner = new TxtLinesScanner();
-        scanner.setFilePath(path);
-    
+        final String path = ResourceUtil.getResourcePath("runoob.json");
+        Scanner scanner = new TxtScanner(path);
         ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
-        log.info("model: {}", model);
+        log.info("model: {}", model.format());
     }
     
 }

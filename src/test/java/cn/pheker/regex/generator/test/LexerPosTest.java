@@ -2,7 +2,8 @@ package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
-import cn.pheker.regex.generator.core.scanner.TxtLinesScanner;
+import cn.pheker.regex.generator.core.scanner.Scanner;
+import cn.pheker.regex.generator.core.scanner.TxtScanner;
 import cn.pheker.regex.generator.util.ResourceUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -23,9 +24,8 @@ public class LexerPosTest {
     
     @Before
     public void initScanner() {
-        String path = ResourceUtil.getResourcePath("runoob.json");
-        TxtLinesScanner scanner = new TxtLinesScanner();
-        scanner.setFilePath(path);
+        final String path = ResourceUtil.getResourcePath("runoob.json");
+        Scanner scanner = new TxtScanner(path);
         lexer = new Lexer(scanner);
     }
     

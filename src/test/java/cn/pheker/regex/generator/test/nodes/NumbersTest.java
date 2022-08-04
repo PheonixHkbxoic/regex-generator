@@ -25,7 +25,7 @@ public class NumbersTest {
         for (String str : targets()) {
             ModelBuilder builder = ModelBuilder.of(str);
             Model model = builder.buildModel();
-            log.info("model: {}", model);
+            log.info("model: {}", model.format());
         }
     }
 

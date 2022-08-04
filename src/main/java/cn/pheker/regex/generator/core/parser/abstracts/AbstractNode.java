@@ -11,7 +11,7 @@ import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
  * @desc
  */
 public abstract class AbstractNode implements Node {
-    protected NonLeaf parent;
+    protected transient NonLeaf parent;
 
     public AbstractNode(NonLeaf parent) {
         this.setParent(parent);
@@ -31,7 +31,7 @@ public abstract class AbstractNode implements Node {
     /**
      * 上下文
      */
-    protected ThreadLocalModelContext context;
+    protected transient ThreadLocalModelContext context;
     
     /**
      * 元数据
@@ -40,6 +40,9 @@ public abstract class AbstractNode implements Node {
 
     @Override
     public MetaInfo getMetaInfo(){
+        if (this.metaInfo == null) {
+            this.metaInfo = new MetaInfo();
+        }
         return this.metaInfo;
     }
 

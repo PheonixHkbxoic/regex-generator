@@ -15,7 +15,7 @@ import java.util.List;
  * @date 2022/7/27 0:17
  * @desc
  */
-public interface Node {
+public interface Node extends DeepFormat{
     /**
      * 获取节点唯一标识
      * @return 节点唯一标识
@@ -145,9 +145,6 @@ public interface Node {
      */
     boolean parseSuccess();
     
-    String printFormatted();
-
-
     /**
      * 生成正则
      * @return 生成的正则列表

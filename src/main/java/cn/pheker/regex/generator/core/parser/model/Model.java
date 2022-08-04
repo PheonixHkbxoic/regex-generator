@@ -2,8 +2,8 @@ package cn.pheker.regex.generator.core.parser.model;
 
 import cn.hutool.core.util.StrUtil;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
+import cn.pheker.regex.generator.core.parser.interfaces.DeepFormat;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import cn.pheker.regex.generator.core.parser.nodes.Sequence;
 import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringScanner;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @date 2022/7/27 0:17
  * @desc
  */
-public class Model {
+public class Model implements DeepFormat {
     NonLeaf root = new Sequence(null);
     ModelMerger merger;
     
@@ -73,11 +73,11 @@ public class Model {
     
     
     @Override
-    public String toString() {
+    public String format() {
         return String.format("\n=================================== 模型 ===================================\n" +
                         "%s" +
                         "============================================================================",
-                root.printFormatted());
+                root.format());
     }
     
     
@@ -111,5 +111,12 @@ public class Model {
     
         return curr;
     }
-    
+
+    public NonLeaf getRoot() {
+        return root;
+    }
+
+    public void setRoot(NonLeaf root) {
+        this.root = root;
+    }
 }

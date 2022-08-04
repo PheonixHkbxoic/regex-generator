@@ -19,7 +19,7 @@ public class Sequence extends AbstractComposite {
     
     @Override
     public String toString() {
-        return StrUtil.times(this.getDeep()) + "Sequence{" + children + '}';
+        return "Sequence{" + children + '}';
     }
     
 }

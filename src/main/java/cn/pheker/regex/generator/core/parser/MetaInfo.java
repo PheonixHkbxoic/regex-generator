@@ -9,7 +9,18 @@ import lombok.Data;
  */
 @Data
 public class MetaInfo {
-    protected int count;
-    protected int len;
+    protected int count = 1;
+    protected int len = 1;
 
+    public void incrCount(){
+        this.count++;
+    }
+
+    @Override
+    public String toString() {
+        return "MetaInfo{" +
+                "count=" + count +
+                ", len=" + len +
+                '}';
+    }
 }

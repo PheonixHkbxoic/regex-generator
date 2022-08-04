@@ -84,15 +84,15 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
     }
     
     @Override
-    public String printFormatted() {
+    public String format() {
         StringBuilder sb = new StringBuilder();
         sb.append(StrUtil.times(getDeep()))
                 .append(this.getClass().getSimpleName())
-                .append("{")
+                .append("{").append("\t").append(this.getMetaInfo())
                 .append('\n');
         
         for (Node child : children) {
-            sb.append(child.printFormatted());
+            sb.append(child.format());
         }
         
         sb.append(StrUtil.times(getDeep()))
@@ -145,5 +145,13 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
     @Override
     public int hashCode() {
         return children.hashCode();
+    }
+
+    public List<Node> getChildren() {
+        return children();
+    }
+
+    public void setChildren(List<Node> children) {
+        this.children = children;
     }
 }

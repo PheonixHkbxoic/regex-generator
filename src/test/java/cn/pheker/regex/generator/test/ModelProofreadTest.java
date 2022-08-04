@@ -24,14 +24,14 @@ public class ModelProofreadTest {
     public void buildModel() {
         String text = "<div>abc</div>";
         model.proofread(text);
-        log.info("before: {}", model);
+        log.info("before: {}", model.format());
     }
 
     @Test
     public void testProofread() {
         String text = "<p>abc</p>";
         boolean proofread = model.proofread(text);
-        log.info("after: {}", model);
+        log.info("after: {}", model.format());
         final Generator gen = Generator.of(model);
         log.info("after regex: {}", gen.generate());
     }
