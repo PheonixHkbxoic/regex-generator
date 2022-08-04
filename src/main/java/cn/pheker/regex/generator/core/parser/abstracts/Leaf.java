@@ -15,6 +15,25 @@ import java.util.List;
  * @desc 叶子节点, 解析不会失败
  */
 public abstract class Leaf extends AbstractNode {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Leaf leaf = (Leaf) o;
+
+        return token.equals(leaf.token);
+    }
+
+    @Override
+    public int hashCode() {
+        return token.hashCode();
+    }
+
     protected Token token;
     
     public Leaf(NonLeaf parent) {
@@ -63,12 +82,11 @@ public abstract class Leaf extends AbstractNode {
     
     @Override
     public String printFormatted() {
-        String sb = StrUtil.times(getDeep()) +
+        return StrUtil.times(getDeep()) +
                 this.getClass().getSimpleName() +
                 "  " +
                 token +
                 '\n';
-        return sb;
     }
 
     @Override

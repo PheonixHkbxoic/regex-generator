@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @desc
  */
 public class Model {
-    Sequence root = new Sequence(null);
+    NonLeaf root = new Sequence(null);
     ModelMerger merger;
     
     public Model() {
@@ -112,7 +112,4 @@ public class Model {
         return curr;
     }
     
-    public Branches result() {
-        return merger.getContainer();
-    }
 }

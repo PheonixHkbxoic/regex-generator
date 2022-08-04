@@ -126,4 +126,24 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
                         .stream().map(prefix::concat))
                 .collect(Collectors.toList());
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NonLeaf)) {
+            return false;
+        }
+
+        NonLeaf nonLeaf = (NonLeaf) o;
+
+        return children().equals(nonLeaf.children());
+    }
+
+    @Override
+    public int hashCode() {
+        return children.hashCode();
+    }
 }

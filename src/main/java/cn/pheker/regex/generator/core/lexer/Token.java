@@ -68,5 +68,28 @@ public class Token {
         
         return token.tok;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Token token = (Token) o;
+
+        if (type != token.type) {
+            return false;
+        }
+        return tok.equals(token.tok);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + tok.hashCode();
+        return result;
+    }
 }
