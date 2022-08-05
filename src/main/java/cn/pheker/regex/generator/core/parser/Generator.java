@@ -51,6 +51,11 @@ public class Generator implements Iterable<String> {
     private void doGeneratorIfAbsent(String nodeId) {
         if (!nodeRegexListCache.containsKey(nodeId)) {
             final Node iteNode = model.search(nodeId);
+            // TODO 正则生成
+            // 1.节点复制
+            // 2.提取公共后缀
+            // 3.节点泛化
+            // 再生成正则
             List<String> regexList = iteNode.generateRegex();
             nodeRegexListCache.put(nodeId, regexList);
         }

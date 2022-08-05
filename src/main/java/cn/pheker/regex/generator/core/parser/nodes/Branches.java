@@ -40,9 +40,16 @@ public class Branches extends AbstractComposite {
         if (regex.size() == 1) {
             return regex;
         } else if (regex.size() == 2 && regex.contains("")) {
-            regex.add("?");
-            String maybeExist = String.join("", regex);
-            return Collections.singletonList(maybeExist);
+            String reCanBeEmpty = regex.get(0);
+            if (reCanBeEmpty.length() == 0) {
+                reCanBeEmpty = regex.get(1);
+            }
+            if (reCanBeEmpty.length() > 1) {
+                reCanBeEmpty = "(?:" + reCanBeEmpty + ")?";
+            }else{
+                reCanBeEmpty += "?";
+            }
+            return Collections.singletonList(reCanBeEmpty);
         }
         String group = regex.stream().collect(Collectors.joining("|", "(?:", ")"));
         return Collections.singletonList(group);

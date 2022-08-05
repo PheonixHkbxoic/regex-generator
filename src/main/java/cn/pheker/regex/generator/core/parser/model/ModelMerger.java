@@ -197,10 +197,16 @@ public class ModelMerger {
     
         // second还有剩余节点
         if (firstEndIndex != secondEndIndex) {
-            Node firstBranch = new Empty(null);
-            List<Node> nodes2 = removeFrom(s2.children(), minLen, secondEndIndex);
-            Node secondBranch = newSequence(nodes2);
-            Branches branches = newBranches(s1, secondBranch, firstBranch);
+
+            List<Node> longer;
+            if (firstEndIndex > secondEndIndex) {
+                longer = removeFrom(s1.children(), minLen, firstEndIndex);
+            } else {
+                longer = removeFrom(s2.children(), minLen, secondEndIndex);
+            }
+            Node empty = new Empty(null);
+            Node branch = newSequence(longer);
+            Branches branches = newBranches(s1, branch, empty);
             branches.setParent(s1);
             // 注意是添加到最后
             s1.add(branches);
@@ -258,12 +264,17 @@ public class ModelMerger {
     
         // second还有剩余节点
         if (firstEndIndex != secondEndIndex) {
-            Node firstBranch = new Empty(null);
-            List<Node> nodes2 = removeFrom(secondPair.children(), minLen, secondEndIndex);
-            Node secondBranch = newSequence(nodes2);
-            Branches branches = newBranches(firstPair, secondBranch, firstBranch);
+            List<Node> longer;
+            if (firstEndIndex > secondEndIndex) {
+                longer = removeFrom(firstPair.children(), minLen, firstEndIndex);
+            } else {
+                longer = removeFrom(secondPair.children(), minLen, secondEndIndex);
+            }
+            Node branch = newSequence(longer);
+            Node empty = new Empty(null);
+            Branches branches = newBranches(firstPair, branch, empty);
             branches.setParent(firstPair);
-            firstPair.children().add(secondEndIndex, branches);
+            firstPair.children().add(minLen, branches);
         }
     }
     

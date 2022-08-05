@@ -31,4 +31,14 @@ public class GuoyaozhuiziTest {
         log.info("testGuoyaozhuizi-regexList: {}", regexList);
     }
 
+    @Test
+    public void testQueryWordsLib() {
+        final String path = ResourceUtil.getResourcePath("query-words-lib.txt");
+        LinesScanner scanner = new LinesScanner(path);
+        final Model model = ModelBuilder.of(scanner).buildModel();
+        log.info("testQueryWordsLib-model: {}", model.format());
+        final List<String> regexList = Generator.of(model).generate();
+        log.info("testQueryWordsLib-regexList: {}", regexList);
+    }
+
 }
