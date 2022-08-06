@@ -57,5 +57,21 @@ public class ModelProofreadTest2 {
         log.info("after regex: {}", gen.generate());
     }
     
+    @Test
+    public void testProofread4() {
+        List<String> lines = Arrays.asList(
+                "di",
+                "cp",
+                "cv",
+                "dx"
+        );
+        for (String line : lines) {
+            boolean proofread = model.proofread(line);
+        }
+        log.info("after: {}", model.format());
+        final Generator gen = Generator.of(model);
+        log.info("after regex: {}", gen.generate());
+    }
+    
     
 }

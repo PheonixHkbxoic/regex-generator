@@ -66,7 +66,7 @@ public class ModelMerger {
      * @param first  第一个节点树, 内部可能含有分支
      * @param second 第二个节点树, 内部不可能含有分支
      */
-    private void doMerge(Node first, Node second) {
+    private boolean doMerge(Node first, Node second) {
         if (!second.isExtendsOf(Empty.class)) {
             first.getMetaInfo().incrCount();
         }
@@ -77,26 +77,31 @@ public class ModelMerger {
             if (first.isExtendsOf(Branches.class)) {
                 Branches branches = (Branches) first;
                 // 查找结构类似的分支
-                boolean foundSame = false;
-                for (Node branch : branches.children()) {
+                boolean mergeSuccess = false;
+                List<Node> children = branches.children();
+                //  fori+size不会导致并发修改异常
+                for (int i = 0; i < children.size(); i++) {
+                    Node branch = children.get(i);
                     if (isStructSame(branch, second)) {
-                        this.doMerge(branch, second);
-                        foundSame = true;
-                        break;
+                        mergeSuccess = this.doMerge(branch, second);
+                        if (mergeSuccess) {
+                            break;
+                        }
+                    
                     }
                 }
             
                 // 结构都不类似,则作为新分支
-                if (!foundSame) {
+                if (!mergeSuccess) {
                     branches.add(second);
                 }
-                return;
+                return true;
             }
         
             // Sequence     + Leaf
             // Leaf         + Sequence
             mergeAsBranches(first, second);
-            return;
+            return true;
         }
     
         // 相同类型节点合并
@@ -114,7 +119,7 @@ public class ModelMerger {
             }
             // Sequence + Sequence
         } else if (first.isExtendsOf(Sequence.class)) {
-            mergeSequenceExceptPair((Sequence) first, (Sequence) second);
+            return mergeSequenceExceptPair((Sequence) first, (Sequence) second);
             // Leaf + Leaf
         } else if (first.isExtendsOf(Leaf.class)) {
             mergeLeaf(((Leaf) first), ((Leaf) second));
@@ -122,7 +127,7 @@ public class ModelMerger {
             // TODO 未处理的相同类型节点合并
             throw new RuntimeException("");
         }
-    
+        return true;
     }
     
     /**
@@ -153,14 +158,13 @@ public class ModelMerger {
      * @param s1 Sequence节点1
      * @param s2 Sequence节点2
      */
-    private void mergeSequenceExceptPair(Sequence s1, Sequence s2) {
+    private boolean mergeSequenceExceptPair(Sequence s1, Sequence s2) {
         // 结构不同, s2作为新分支
         if (!isStructSame(s1.children().get(0), s2.children().get(0))
                 && s1.getParent().isExtendsOf(Branches.class)) {
-            s1.getParent().add(s2);
-            return;
+            return false;
         }
-    
+        
         // div + p/pi/didc/di/dip 分支如下
         // div
         // p^2i
@@ -171,7 +175,7 @@ public class ModelMerger {
         for (int i = 0; i < minLen; i++) {
             Node firstSub = s1.children().get(i);
             Node secondSub = s2.children().get(i);
-        
+    
             if (isStructSame(firstSub, secondSub)) {
                 this.doMerge(firstSub, secondSub);
                 continue;
@@ -179,12 +183,10 @@ public class ModelMerger {
             // 发现这是个分支节点 那么这个分支节点一定是最后一个节点
             if (firstSub.isExtendsOf(Branches.class)) {
                 List<Node> nodes = s2.children().subList(i, s2.size());
-                if (!nodes.isEmpty()) {
-                    this.doMerge(firstSub, newSequence(nodes));
-                }
-                return;
+                this.doMerge(firstSub, newSequence(nodes));
+                return true;
             }
-        
+    
             // 因为如果节点不同的话  会合并成一个Branches节点
             List<Node> nodes1 = removeFrom(s1.children(), i, firstEndIndex);
             Node firstBranch = nodes1.isEmpty() ? new Empty(null) : newSequence(nodes1);
@@ -192,12 +194,12 @@ public class ModelMerger {
             Node secondBranch = nodes2.isEmpty() ? new Empty(null) : newSequence(nodes2);
             Branches branches = newBranches(s1, firstBranch, secondBranch);
             s1.add(branches);
-            return;
+            return true;
         }
-    
+        
         // second还有剩余节点
         if (firstEndIndex != secondEndIndex) {
-
+    
             List<Node> longer;
             if (firstEndIndex > secondEndIndex) {
                 longer = removeFrom(s1.children(), minLen, firstEndIndex);
@@ -211,6 +213,7 @@ public class ModelMerger {
             // 注意是添加到最后
             s1.add(branches);
         }
+        return true;
     }
     
     /**
@@ -235,7 +238,7 @@ public class ModelMerger {
         for (int i = 1; i < minLen; i++) {
             Node firstSub = firstPair.children().get(i);
             Node secondSub = secondPair.children().get(i);
-        
+    
             if (isStructSame(firstSub, secondSub)) {
                 this.doMerge(firstSub, secondSub);
                 continue;
@@ -249,7 +252,7 @@ public class ModelMerger {
                 }
                 return;
             }
-        
+    
             // 因为如果节点不同的话  会合并成一个Branches节点
             List<Node> nodes1 = removeFrom(firstPair.children(), i, firstEndIndex);
             Node firstBranch = nodes1.isEmpty() ? new Empty(null) : newSequence(nodes1);
