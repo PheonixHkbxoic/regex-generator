@@ -119,8 +119,9 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
     }
 
     /**
-     * 迪卡尔积
-     * @return 迪卡尔积
+     * 笛卡尔积
+     *
+     * @return 笛卡尔积
      **/
     protected List<String> cartesian(List<String> first, List<String> second) {
         if (first == null || first.isEmpty()) {

@@ -10,7 +10,6 @@ import cn.pheker.regex.generator.core.parser.nodes.Sequence;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -67,9 +66,9 @@ public class ModelMerger {
      * @param second 第二个节点树, 内部不可能含有分支
      */
     private boolean doMerge(Node first, Node second) {
-        if (!second.isExtendsOf(Empty.class)) {
-            first.getMetaInfo().incrCount();
-        }
+//        if (!second.isExtendsOf(Empty.class)) {
+//            first.getMetaInfo().incrLeaf();
+//        }
     
         // 合并结构不同的结点
         if (!isStructSame(first, second)) {
@@ -144,7 +143,6 @@ public class ModelMerger {
             first.getParent().add(second);
         } else {
             final Branches branches = new Branches(first.getParent());
-            branches.getMetaInfo().setCount(first.getMetaInfo().getCount() + 2);
             final List<Node> children = branches.children();
             children.add(first);
             children.add(second);
@@ -224,8 +222,8 @@ public class ModelMerger {
      * @param secondPair Pair节点2
      */
     private void mergePair(Pair firstPair, Pair secondPair) {
-        firstPair.getStart().getMetaInfo().incrCount();
-        firstPair.getEnd().getMetaInfo().incrCount();
+//        firstPair.getStart().getMetaInfo().incrLeaf();
+//        firstPair.getEnd().getMetaInfo().incrLeaf();
     
         // 相同Pair
         // <div data="123">与<p id="title">
@@ -286,11 +284,6 @@ public class ModelMerger {
         for (Node node : nodes) {
             branches.add(node);
         }
-        Integer sumCount = Arrays.stream(nodes)
-                .map(n -> n.getMetaInfo().getCount())
-                .reduce(Integer::sum)
-                .orElse(0);
-        branches.getMetaInfo().setCount(sumCount);
         return branches;
     }
     
