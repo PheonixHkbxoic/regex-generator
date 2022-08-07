@@ -1,5 +1,6 @@
 package cn.pheker.regex.generator.test;
 
+import cn.pheker.regex.generator.core.parser.Generator;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
 import cn.pheker.regex.generator.core.scanner.Scanner;
@@ -57,6 +58,8 @@ public class ModelBuilderTest {
         ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model.format());
+        Generator gen = Generator.of(model);
+        log.info("gen: {}", gen.generate());
     }
     
     @Test
@@ -66,6 +69,8 @@ public class ModelBuilderTest {
         ModelBuilder builder = ModelBuilder.of(scanner);
         Model model = builder.buildModel();
         log.info("model: {}", model.format());
+        Generator gen = Generator.of(model);
+        log.info("gen: {}", gen.generate());
     }
     
 }
