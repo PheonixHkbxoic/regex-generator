@@ -1,5 +1,6 @@
 package cn.pheker.regex.generator.core.parser.model;
 
+import cn.pheker.regex.generator.core.parser.MetaInfo;
 import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
@@ -137,8 +138,8 @@ public class ModelMerger {
      */
     private void mergeLeaf(Leaf first, Leaf second) {
         if (leafEquals(first, second)) {
-//            MetaInfo metaInfo = first.getMetaInfo();
-//            metaInfo.incrCount();
+            MetaInfo metaInfo = first.getMetaInfo();
+            metaInfo.incrLeaf();
         } else if (first.getParent().isExtendsOf(Branches.class)) {
             first.getParent().add(second);
         } else {

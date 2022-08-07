@@ -32,15 +32,11 @@ public class MetaInfo {
     
     public MetaInfo(Node node) {
         this.node = node;
+        incrLeaf();
     }
     
     public void statistics() {
-        if (this.lenTimes != null) {
-            return;
-        }
         if (node.isExtendsOf(Leaf.class)) {
-            lenTimes = new HashMap<>(1);
-            lenTimes.put(node.isExtendsOf(Empty.class) ? 0 : 1, 1);
             return;
         }
         
@@ -104,8 +100,15 @@ public class MetaInfo {
     }
     
     public void incrLeaf() {
-        Integer oldTimes = this.lenTimes.getOrDefault(1, 1);
-        this.lenTimes.put(1, ++oldTimes);
+        int len = 1;
+        if (node.isExtendsOf(Empty.class)) {
+            len = 0;
+        }
+        if (lenTimes == null) {
+            lenTimes = new HashMap<>(1);
+        }
+        Integer oldTimes = this.lenTimes.getOrDefault(len, 0);
+        this.lenTimes.put(len, ++oldTimes);
     }
     
     @Override

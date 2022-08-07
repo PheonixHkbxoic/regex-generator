@@ -1,7 +1,7 @@
 package cn.pheker.regex.generator.core.parser;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.interfaces.Strategy;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelIterator;
 
@@ -53,10 +53,14 @@ public class Generator implements Iterable<String> {
             final Node iteNode = model.search(nodeId);
             // TODO 正则生成
             // 1.节点复制
+            Node cpNode = BeanUtil.toBean(iteNode, iteNode.getClass());
             // 2.提取公共后缀
             // 3.节点泛化
+//            Generalizer generalizer = Generalizer.of(cpNode);
+//            List<String> regexList = generalizer.generalize(cpNode);
+    
             // 再生成正则
-            List<String> regexList = iteNode.generateRegex();
+            List<String> regexList = cpNode.generateRegex();
             nodeRegexListCache.put(nodeId, regexList);
         }
     }

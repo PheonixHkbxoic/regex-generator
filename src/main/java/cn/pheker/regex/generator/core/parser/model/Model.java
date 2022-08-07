@@ -59,7 +59,7 @@ public class Model implements DeepFormat {
      * @param mc 模型上下文
      * @return 校正成功或失败
      */
-    public boolean proofread(ModelContext mc) {
+    private boolean proofread(ModelContext mc) {
         ThreadLocalModelContext tlmc = ThreadLocalModelContext.of(mc);
         Sequence other = new Sequence(null);
         other.setContext(tlmc);
