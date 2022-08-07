@@ -3,7 +3,6 @@ package cn.pheker.regex.generator.core.parser.abstracts;
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.Token;
 import cn.pheker.regex.generator.core.lexer.TokenType;
-import cn.pheker.regex.generator.core.parser.MetaInfo;
 import cn.pheker.regex.generator.util.StrUtil;
 
 import java.util.Collections;
@@ -94,21 +93,6 @@ public abstract class Leaf extends AbstractNode {
 
     @Override
     public List<String> generateRegex() {
-        MetaInfo metaInfo = this.getMetaInfo();
-        if (metaInfo.getMaxTimes() > 1
-                && parent.getMetaInfo().isMultiLen()) {
-            String re = token.getTok();
-            if (this.isTokenType(TokenType.DIGIT)) {
-                re = "\\d";
-            } else if (isTokenType(TokenType.Upper)) {
-                re = "[A-Z]";
-            } else if (isTokenType(TokenType.Lower)) {
-                re = "[a-z]";
-            } else if (isTokenType(TokenType.Other)) {
-                re = "[\\x4e00-\\x9fa5]";
-            }
-            return Collections.singletonList(re);
-        }
         return Collections.singletonList(token.getTok());
     }
 }

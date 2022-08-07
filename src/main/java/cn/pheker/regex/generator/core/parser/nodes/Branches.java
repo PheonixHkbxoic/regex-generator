@@ -5,9 +5,7 @@ import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.exception.TooManyRegex;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,14 +27,16 @@ public class Branches extends AbstractComposite {
     
     @Override
     public List<String> generateRegex() {
-        List<String> regex = new ArrayList<>();
+        Set<String> reAll = new HashSet<>();
         for (Node child : children()) {
-            regex.addAll(child.generateRegex());
-            if (regex.size() > 10000) {
+            List<String> res = child.generateRegex();
+            reAll.addAll(res);
+            if (reAll.size() > 10000) {
                 throw new TooManyRegex();
             }
         }
-        
+        List<String> regex = new ArrayList<>(reAll);
+    
         if (regex.size() == 1) {
             return regex;
         } else if (regex.size() == 2 && regex.contains("")) {

@@ -135,7 +135,7 @@ public class MetaInfo {
             if (max == null) {
                 max = len;
             }
-            
+    
             if (min > len) {
                 min = len;
             }
@@ -146,9 +146,23 @@ public class MetaInfo {
         return new IntTuple(min, max);
     }
     
-    public int getMaxTimes() {
-        return lenTimes.values().stream()
-                .max(Integer::compareTo)
-                .orElse(1);
+    public IntTuple getMinMaxTimes() {
+        Integer min = null, max = null;
+        for (Integer len : lenTimes.keySet()) {
+            if (min == null) {
+                min = len;
+            }
+            if (max == null) {
+                max = len;
+            }
+            
+            if (min > len) {
+                min = len;
+            }
+            if (max < len) {
+                max = len;
+            }
+        }
+        return new IntTuple(min, max);
     }
 }
