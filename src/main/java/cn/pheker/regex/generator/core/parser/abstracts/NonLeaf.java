@@ -2,8 +2,6 @@ package cn.pheker.regex.generator.core.parser.abstracts;
 
 import cn.pheker.regex.generator.core.parser.interfaces.Last;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
-import cn.pheker.regex.generator.core.parser.nodes.Empty;
-import cn.pheker.regex.generator.exception.TooManyRegex;
 import cn.pheker.regex.generator.util.StrUtil;
 
 import java.util.ArrayList;
@@ -101,23 +99,8 @@ public abstract class NonLeaf extends AbstractNode implements Iterator<Node>, La
                 .append('\n');
         return sb.toString();
     }
-
-    @Override
-    public List<String> generateRegex() {
-        List<String> regex = null;
-        boolean containEmpty = children().removeIf(c -> c.isExtendsOf(Empty.class));
-        if (containEmpty) {
-            this.add(new Empty(this));
-        }
-        for (Node child : children()) {
-            regex = cartesian(regex, child.generateRegex());
-            if (regex.size() > 10000) {
-                throw new TooManyRegex();
-            }
-        }
-        return regex;
-    }
-
+    
+    
     /**
      * 笛卡尔积
      *

@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * @author wanghaijun
+ * @author cn.pheker
  * @version 1.0.0
  * @date 2022/8/7 12:28
  * @desc 泛化器测试

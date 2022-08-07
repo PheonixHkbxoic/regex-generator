@@ -5,6 +5,7 @@ import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import cn.pheker.regex.generator.core.parser.nodes.Empty;
+import cn.pheker.regex.generator.misc.IntTuple;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -118,5 +119,36 @@ public class MetaInfo {
                         .map(e -> String.format("(%d,%d)", e.getKey(), e.getValue()))
                         .collect(Collectors.joining(",", "[", "]")) +
                 '}';
+    }
+    
+    
+    public boolean isMultiLen() {
+        return lenTimes.size() > 1;
+    }
+    
+    public IntTuple getMinMaxLen() {
+        Integer min = null, max = null;
+        for (Integer len : lenTimes.keySet()) {
+            if (min == null) {
+                min = len;
+            }
+            if (max == null) {
+                max = len;
+            }
+            
+            if (min > len) {
+                min = len;
+            }
+            if (max < len) {
+                max = len;
+            }
+        }
+        return new IntTuple(min, max);
+    }
+    
+    public int getMaxTimes() {
+        return lenTimes.values().stream()
+                .max(Integer::compareTo)
+                .orElse(1);
     }
 }
