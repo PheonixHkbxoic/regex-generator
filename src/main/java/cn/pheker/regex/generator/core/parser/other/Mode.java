@@ -15,10 +15,15 @@ public enum Mode {
      * 通用模式
      **/
     Generate,
-
+    
     /**
      * 极致模式
      **/
     Extreme,
-
+    
+    /**
+     * 极致模式
+     **/
+    Full
+    
 }

@@ -138,8 +138,10 @@ public class Generalizer {
                 }
             }
         }
-        
-        Level level = wrapper.item.level;
+    
+        Level rootLevel = wrapper.item.level;
+        Level defaultLevel = Level.from(config.getMode().ordinal());
+        Level level = Level.selectHigherLevel(rootLevel, defaultLevel);
         wrapper.generalize(level);
         return wrapper.getItem().regex;
     }
