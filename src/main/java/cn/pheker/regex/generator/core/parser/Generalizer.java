@@ -85,6 +85,7 @@ public class Generalizer {
 
     /**
      * 泛化
+     *
      * @return 泛化后的正则
      **/
     public String generalize() {
@@ -93,6 +94,7 @@ public class Generalizer {
 
     private String doGeneralize(Node target) {
         final Wrapper wrapper = Wrapper.of(target, null);
+        wrapper.setLevel(Level.LEVEL_1);
         stack.push(wrapper);
 
         while (!stack.isEmpty()) {
@@ -105,44 +107,41 @@ public class Generalizer {
             }
 
             final Node node = w.getNode();
+            final Item item = new Item();
+            item.times = node.getMetaInfo().getMinMaxTimes();
+            item.level = Level.LEVEL_0;
+            w.item = item;
+            if (w.parent != null) {
+                w.parent.children.add(w);
+            }
+
             if (node.isLeaf()) {
-                final Item item = new Item();
-                item.level = Level.LEVEL_0;
-                item.times = node.getMetaInfo().getMinMaxTimes();
                 item.regex = ((Leaf) node).getToken().getTok();
-                item.charLevelUp(w.level);
-                w.item = item;
+                w.generalize(item.level);
             } else if (node.isExtendsOf(Branches.class)) {
                 // calc children's item
-                final Item item = new Item();
                 item.level = Level.LEVEL_1;
-                item.times = node.getMetaInfo().getMinMaxTimes();
+                w.generalize(item.level);
                 if (w.children.size() == 1) {
                     item.regex = w.children.get(0).item.regex;
-                }else {
+                } else {
                     item.regex = w.children.stream()
                             .map(Wrapper::getItem)
                             .map(Item::getRegex)
                             .collect(Collectors.joining("|", "(?:", ")"));
                 }
-                w.item = item;
-            } else{
+            } else {
                 // Sequence
-                final Item item = new Item();
-                item.times = node.getMetaInfo().getMinMaxTimes();
-                item.level = item.times.same()?Level.LEVEL_0:Level.LEVEL_1;
+                item.level = item.times.same() ? Level.LEVEL_0 : Level.LEVEL_1;
+                w.generalize(item.level);
                 if (w.children.size() == 1) {
                     item.regex = w.children.get(0).item.regex;
-                }else {
+                } else {
                     item.regex = w.children.stream()
                             .map(Wrapper::getItem)
                             .map(Item::getRegex)
                             .collect(Collectors.joining());
                 }
-                w.item = item;
-            }
-            if (w.parent != null) {
-                w.parent.children.add(w);
             }
         }
 
@@ -184,8 +183,19 @@ public class Generalizer {
             return ((NonLeaf) node).children().get(curr++);
         }
 
-        private void generalize() {
+        private void generalize(Level currLevel) {
+            if (node.isLeaf()) {
+                item.charLevelUp(currLevel);
+                return;
+            }
+            for (Wrapper wc : children) {
+                wc.generalize(currLevel);
+            }
+        }
 
+        @Override
+        public String toString() {
+            return this.getClass().getSimpleName() + "{" + this.item + "}";
         }
     }
 
@@ -205,7 +215,7 @@ public class Generalizer {
             }
             switch (level) {
                 case LEVEL_0:
-                    regex = table[regex.charAt(0)];
+                    regex = regex == null || regex.length() == 0 ? "" : table[regex.charAt(0)];
                     break;
                 case LEVEL_1:
                     if (ch.contains(Digit) || ch.contains(Lower)
@@ -217,6 +227,15 @@ public class Generalizer {
                     regex = ".";
                     break;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "Item{" +
+                    "level=" + level +
+                    ", regex=" + regex  +
+                    ", times=" + times +
+                    '}';
         }
     }
 
