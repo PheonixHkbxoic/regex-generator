@@ -5,10 +5,7 @@ import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelIterator;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author cn.pheker
@@ -56,11 +53,12 @@ public class Generator implements Iterable<String> {
             Node cpNode = BeanUtil.toBean(iteNode, iteNode.getClass());
             // 2.提取公共后缀
             // 3.节点泛化
-//            Generalizer generalizer = Generalizer.of(cpNode);
-//            List<String> regexList = generalizer.generalize(cpNode);
-    
+            Generalizer generalizer = Generalizer.of(cpNode, config);
+            String regex = generalizer.generalize();
+            List<String> regexList = Collections.singletonList(regex);
+
             // 再生成正则
-            List<String> regexList = cpNode.generateRegex();
+//            List<String> regexList = cpNode.generateRegex();
             nodeRegexListCache.put(nodeId, regexList);
         }
     }
