@@ -120,7 +120,6 @@ public class Generalizer {
                 w.generalize(item.level);
             } else if (node.isExtendsOf(Branches.class)) {
                 // calc children's item
-                item.level = Level.LEVEL_1;
                 w.generalize(item.level);
                 if (w.children.size() == 1) {
                     item.regex = w.children.get(0).item.regex;
@@ -133,7 +132,6 @@ public class Generalizer {
             } else {
                 // Sequence
                 item.level = item.times.same() ? Level.LEVEL_0 : Level.LEVEL_1;
-                w.generalize(item.level);
                 if (w.children.size() == 1) {
                     item.regex = w.children.get(0).item.regex;
                 } else {
@@ -145,6 +143,7 @@ public class Generalizer {
             }
         }
 
+        wrapper.generalize(wrapper.level);
         return wrapper.getItem().regex;
     }
 
@@ -189,7 +188,7 @@ public class Generalizer {
                 return;
             }
             for (Wrapper wc : children) {
-                wc.generalize(currLevel);
+                wc.generalize(Level.selectHigherLevel(currLevel, wc.level));
             }
         }
 
@@ -215,7 +214,13 @@ public class Generalizer {
             }
             switch (level) {
                 case LEVEL_0:
-                    regex = regex == null || regex.length() == 0 ? "" : table[regex.charAt(0)];
+                    regex =  "";
+                    if (regex != null && regex.length() > 0){
+                        final char c = regex.charAt(0);
+                        if (c <= 127) {
+                            regex = table[c];
+                        }
+                    }
                     break;
                 case LEVEL_1:
                     if (ch.contains(Digit) || ch.contains(Lower)
@@ -246,6 +251,13 @@ public class Generalizer {
         LEVEL_3,
 
         ;
+
+        public static Level selectHigherLevel(Level level, Level level2) {
+            if (level.ordinal() > level2.ordinal()) {
+                return level;
+            }
+            return level2;
+        }
 
         public static Level higherLevel(Level level) {
             return from(level.ordinal() + 1);
