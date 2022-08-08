@@ -27,6 +27,7 @@ public class GeneralizerTest {
                 "pheker golang 88\n" +
                 "pheker golang 88\n" +
                 "pheker golang 88\n" +
+                "pheker golang 88\n" +
                 "zj java 15\n" +
                 "zj php 95\n" +
                 "93 zj js";

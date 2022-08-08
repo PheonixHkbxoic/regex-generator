@@ -26,4 +26,16 @@ public class GeneratorConfig {
      * 即分支数量达到levelUpBranchNum时考虑升级
      */
     private int levelUpBranchNum = 3;
+    
+    /**
+     * 分支默认使用捕获组;
+     */
+    private boolean useCapturedGroup = false;
+    
+    /**
+     * 不定长字符, 最大长度与最小长度差大于wildcardMinInterval时
+     * 使用通配符*或+代替, 否则使用范围长度如:{5},{2,8}
+     * 当然,前提是最小长度为0时 才可能使用*,为1时才可能使用+
+     */
+    private int wildcardMinInterval = 3;
 }

@@ -4,6 +4,8 @@ import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.nodes.Branches;
+import cn.pheker.regex.generator.core.parser.nodes.Id;
+import cn.pheker.regex.generator.core.parser.nodes.Numbers;
 import cn.pheker.regex.generator.misc.IntTuple;
 import lombok.Data;
 
@@ -18,7 +20,8 @@ import java.util.stream.Collectors;
  */
 public class Generalizer {
     private Node node;
-
+    private static GeneratorConfig config;
+    
     private static String Empty = "";
     private static String Digit = "\\d";
     private static String Upper = "A-Z";
@@ -58,31 +61,38 @@ public class Generalizer {
             // 120-127
             Lower, Lower, Lower, "{", "|", "}", "~", Empty
     };
-
+    
+    static String Letter = "[a-zA-z]";
+    static String Word = "\\w";
+    static String Extend = "[\\x80-\\xff]";
+    static String Chinese = "[\\x4e00-\\x9fa5]";
+    static String Line = ".";
+    static String All = "[\\s\\S]";
+    
+    static Map<String, String> levelTree = new HashMap<>();
+    
     static {
-        Map<String, String> levelTree = new HashMap<>();
         levelTree.put(Digit, "\\d");
         levelTree.put(Lower, "[a-z]");
         levelTree.put(Upper, "[A-Z]");
-        levelTree.put("_", "[a-zA-z]");
         levelTree.put(Blank, "\\s");
-        levelTree.put("", ".");
         for (String c : ".\\?*+|{}()[]".split("")) {
             levelTree.put(c, "\\" + c);
         }
     }
-
-
+    
+    
     public static Generalizer of(Node node, GeneratorConfig config) {
         return new Generalizer(node, config);
     }
-
+    
     private Generalizer(Node node, GeneratorConfig config) {
         this.node = node;
+        Generalizer.config = config;
     }
-
+    
     private Stack<Wrapper> stack = new Stack<>();
-
+    
     /**
      * 泛化
      *
@@ -91,12 +101,11 @@ public class Generalizer {
     public String generalize() {
         return this.doGeneralize(this.node);
     }
-
+    
     private String doGeneralize(Node target) {
         final Wrapper wrapper = Wrapper.of(target, null);
-        wrapper.setLevel(Level.LEVEL_1);
         stack.push(wrapper);
-
+        
         while (!stack.isEmpty()) {
             final Wrapper w = stack.pop();
             if (!w.isFinished()) {
@@ -105,63 +114,53 @@ public class Generalizer {
                 stack.push(Wrapper.of(child, w));
                 continue;
             }
-
+            
             final Node node = w.getNode();
             final Item item = new Item();
+            item.clzz = node.getClass();
             item.times = node.getMetaInfo().getMinMaxTimes();
+            item.lens = node.getMetaInfo().getMinMaxLen();
             item.level = Level.LEVEL_0;
             w.item = item;
             if (w.parent != null) {
                 w.parent.children.add(w);
             }
-
+            
             if (node.isLeaf()) {
                 item.regex = ((Leaf) node).getToken().getTok();
-                w.generalize(item.level);
             } else if (node.isExtendsOf(Branches.class)) {
                 // calc children's item
-                w.generalize(item.level);
-                if (w.children.size() == 1) {
-                    item.regex = w.children.get(0).item.regex;
-                } else {
-                    item.regex = w.children.stream()
-                            .map(Wrapper::getItem)
-                            .map(Item::getRegex)
-                            .collect(Collectors.joining("|", "(?:", ")"));
+                if (w.children.size() > config.getLevelUpBranchNum()) {
+                    item.level = Level.LEVEL_1;
                 }
-            } else {
-                // Sequence
-                item.level = item.times.same() ? Level.LEVEL_0 : Level.LEVEL_1;
-                if (w.children.size() == 1) {
-                    item.regex = w.children.get(0).item.regex;
-                } else {
-                    item.regex = w.children.stream()
-                            .map(Wrapper::getItem)
-                            .map(Item::getRegex)
-                            .collect(Collectors.joining());
+                if (item.times.same()) {
+                    item.level = Level.LEVEL_0;
                 }
             }
         }
-
-        wrapper.generalize(wrapper.level);
+        
+        Level level = wrapper.item.level;
+        wrapper.generalize(level);
         return wrapper.getItem().regex;
     }
-
-
+    
+    
     @Data
-    static class Wrapper {
+    public static class Wrapper {
         private Node node;
-        private Level level;
         private Wrapper parent;
         private List<Wrapper> children;
         private Item item;
         private int curr;
         private int size;
-
+        /**
+         * 直接使用item.regex,而不是通过generalize方法计算获取item.regex
+         */
+        private boolean useRegex = false;
+        
         public static Wrapper of(Node node, Wrapper parent) {
             final Wrapper wrapper = new Wrapper();
             wrapper.node = node;
-            wrapper.level = Level.LEVEL_0;
             wrapper.parent = parent;
             wrapper.children = new ArrayList<>();
             if (!node.isLeaf()) {
@@ -169,41 +168,124 @@ public class Generalizer {
             }
             return wrapper;
         }
-
+        
         public boolean isRoot() {
             return parent == null;
         }
-
+        
         public boolean isFinished() {
             return curr >= size;
         }
-
+        
         public Node getChild() {
             return ((NonLeaf) node).children().get(curr++);
         }
-
+        
         private void generalize(Level currLevel) {
             if (node.isLeaf()) {
                 item.charLevelUp(currLevel);
                 return;
             }
             for (Wrapper wc : children) {
-                wc.generalize(Level.selectHigherLevel(currLevel, wc.level));
+                if (!wc.useRegex) {
+                    wc.generalize(Level.selectHigherLevel(currLevel, wc.item.level));
+                }
+            }
+            
+            if (node.isExtendsOf(Branches.class)) {
+                if (this.children.size() == 1) {
+                    item.regex = this.children.get(0).item.regex;
+                } else {
+                    List<String> list = this.children.stream()
+                            .map(Wrapper::getItem)
+                            .map(Item::getRegex)
+                            .collect(Collectors.toList());
+                    distinct(list);
+                    String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
+                    item.regex = list.stream()
+                            .collect(Collectors.joining("|", groupPrefix, ")"));
+                }
+            } else {
+                // Sequence
+                if (node.isExtendsOf(Id.class)) {
+                    IntTuple lens = item.getLens();
+                    item.regex = wildcard(Word, lens);
+                    this.useRegex = true;
+                }
+                if (node.isExtendsOf(Numbers.class)) {
+                    IntTuple lens = item.getLens();
+                    item.regex = wildcard(Digit, lens);
+                    this.useRegex = true;
+                } else if (this.children.size() == 1) {
+                    item.regex = this.children.get(0).item.regex;
+                } else {
+                    List<String> list = this.children.stream()
+                            .map(Wrapper::getItem)
+                            .map(Item::getRegex)
+                            .collect(Collectors.toList());
+                    distinct(list);
+                    item.regex = list.stream().collect(Collectors.joining());
+                }
             }
         }
-
+        
+        private String wildcard(String re, IntTuple lens) {
+            Integer min = lens.getM(), max = lens.getN();
+            if (lens.same()) {
+                return String.format("%s{%d}", re, min);
+            } else {
+                char wildcard = min == 0 ? '*' : min == 1 ? '+' : '\0';
+                if (wildcard != '\0' && max - min > config.getWildcardMinInterval()) {
+                    return String.format("%s%s", re, wildcard);
+                } else {
+                    return String.format("%s{%d,%d}", re, min, max);
+                }
+            }
+        }
+        
+        public static void distinct(List<String> list) {
+            if (list.isEmpty()) {
+                return;
+            }
+            int index = 0, count = 1;
+            String curr = list.remove(0);
+            while (index < list.size()) {
+                String next = list.remove(index);
+                if (curr.equals(next)) {
+                    count++;
+                    continue;
+                } else {
+                    if (count == 1) {
+                        list.add(index, curr);
+                    } else {
+                        list.add(index, curr + "{" + count + "}");
+                    }
+                    curr = next;
+                    index++;
+                    count = 1;
+                }
+            }
+            if (count == 1) {
+                list.add(index, curr);
+            } else {
+                list.add(index, curr + "{" + count + "}");
+            }
+        }
+        
         @Override
         public String toString() {
             return this.getClass().getSimpleName() + "{" + this.item + "}";
         }
     }
-
+    
     @Data
     static class Item {
+        private Class clzz;
         private Level level;
         private String regex;
         private IntTuple times;
-
+        public IntTuple lens;
+        
         public void charLevelUp(Level currLevel) {
             String ch = regex;
             if (level.ordinal() >= currLevel.ordinal()) {
@@ -212,10 +294,10 @@ public class Generalizer {
             if (level.ordinal() < currLevel.ordinal() - 1) {
                 charLevelUp(Level.higherLevel(level));
             }
-            switch (level) {
+            switch (currLevel) {
                 case LEVEL_0:
-                    regex =  "";
-                    if (regex != null && regex.length() > 0){
+                    regex = "";
+                    if (regex != null && regex.length() > 0) {
                         final char c = regex.charAt(0);
                         if (c <= 127) {
                             regex = table[c];
@@ -223,9 +305,38 @@ public class Generalizer {
                     }
                     break;
                 case LEVEL_1:
-                    if (ch.contains(Digit) || ch.contains(Lower)
-                            || ch.contains(Upper) || ch.contains("_")) {
-                        regex = "\\w";
+                    // 如 a-z
+                    if (regex != null && regex.length() > 0) {
+                        final char c = regex.charAt(0);
+                        if (c <= 127) {
+                            regex = table[c];
+                        } else if (c <= 256) {
+                            regex = Extend;
+                        } else if (c >= 0x4e00 && c <= 0x9fa5) {
+                            regex = Chinese;
+                        }
+                    }
+                    
+                    // [a-z]
+                    if (regex != null) {
+                        String rr = levelTree.get(regex);
+                        if (rr != null && rr.length() > 0 && !regex.equals(rr)) {
+                            if (rr.contains(regex)) {
+                                regex = rr;
+                            } else {
+                                if (regex.equals(Lower) && rr.equals(Upper)) {
+                                    regex = Letter;
+                                } else if (regex.equals(Digit) || regex.contains("_")) {
+                                    regex = Word;
+                                } else if (rr.contains("\r") || rr.contains("\n")) {
+                                    regex = All;
+                                } else {
+                                    regex = Line;
+                                }
+                            }
+                        }
+                    } else {
+                        regex = "";
                     }
                     break;
                 default:
@@ -233,36 +344,36 @@ public class Generalizer {
                     break;
             }
         }
-
+        
         @Override
         public String toString() {
             return "Item{" +
                     "level=" + level +
-                    ", regex=" + regex  +
+                    ", regex=" + regex +
                     ", times=" + times +
                     '}';
         }
     }
-
+    
     enum Level {
         LEVEL_0,
         LEVEL_1,
         LEVEL_2,
         LEVEL_3,
-
+        
         ;
-
+        
         public static Level selectHigherLevel(Level level, Level level2) {
             if (level.ordinal() > level2.ordinal()) {
                 return level;
             }
             return level2;
         }
-
+        
         public static Level higherLevel(Level level) {
             return from(level.ordinal() + 1);
         }
-
+        
         public static Level from(int level) {
             for (Level l : values()) {
                 if (l.ordinal() == level) {
