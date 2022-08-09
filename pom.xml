@@ -55,13 +55,16 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+            </resource>
         </resources>
         <testResources>
             <testResource>
-                <directory>src/test/resources</directory>
+                <directory>src/main/resources</directory>
             </testResource>
             <testResource>
-                <directory>src/main/resources</directory>
+                <directory>src/test/resources</directory>
             </testResource>
         </testResources>
         <plugins>
