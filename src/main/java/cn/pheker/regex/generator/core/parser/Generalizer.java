@@ -227,8 +227,8 @@ public class Generalizer {
                     distinctTwice(list, true);
                     // 最外层不使用(?:)或()
                     if (parent == null) {
-                        item.regex = list.stream().collect(Collectors.joining("|"));
-                    }else {
+                        item.regex = String.join("|", list);
+                    } else {
                         String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
                         item.regex = list.stream()
                                 .collect(Collectors.joining("|", groupPrefix, ")"));
@@ -253,9 +253,10 @@ public class Generalizer {
                             .map(Item::getRegex)
                             .collect(Collectors.toList());
                     distinctTwice(list, false);
-                    item.regex = list.stream().collect(Collectors.joining());
+                    item.regex = String.join("", list);
                 }
             }
+            log.debug("generalize-wrapper: {}", this);
         }
 
         /**
@@ -293,7 +294,7 @@ public class Generalizer {
                 return String.format("%s{%d}", re, min);
             } else {
                 char wildcard = min == 0 ? '*' : min == 1 ? '+' : '\0';
-                if (wildcard != '\0' && max - min > (config == null? 3:config.getWildcardMinInterval())) {
+                if (wildcard != '\0' && max - min > (config == null ? 3 : config.getWildcardMinInterval())) {
                     return String.format("%s%s", re, wildcard);
                 } else {
                     return String.format("%s{%d,%d}", re, min, max);
@@ -303,13 +304,14 @@ public class Generalizer {
 
         /**
          * 对list中相似的正则 压缩合并
+         *
          * @param isBranch 是否是分支,
-         * 如果是分支
-         *     相同的会忽略 如:\d{2} \d{2}会取其一
-         *     相似的取最大范围 如:\d{2,4} \d{3,6}会变成\d{2,6}
-         * 如果是Sequence
-         *     相同的会累加 如:\d{2} \d{2}会变成\d{4}
-         *     相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{4,10}
+         *                 如果是分支
+         *                 相同的会忽略 如:\d{2} \d{2}会取其一
+         *                 相似的取最大范围 如:\d{2,4} \d{3,6}会变成\d{2,6}
+         *                 如果是Sequence
+         *                 相同的会累加 如:\d{2} \d{2}会变成\d{4}
+         *                 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{5,10}
          **/
         public static void distinct(List<String> list, boolean isBranch) {
             if (list.isEmpty()) {
@@ -342,22 +344,46 @@ public class Generalizer {
         }
 
         public static void distinctTwice(List<String> list, boolean isBranch) {
-            int index = 0;
-            String curr = list.remove(0);
-            final String[] segs = curr.split("[{}]");
-            IntTuple times = segs.length > 1 ? range(segs[1]) : new IntTuple(1, 1);
-            int min = times.getM();
-            int max = times.getN();
-            curr = segs[0];
+            int start = 0, end = 0;
+            String curr = null;
+            int min = 1, max = 1;
 
-            while (index < list.size()) {
-                String next = list.remove(index);
+            while (end < list.size()) {
+                // 跳过组()和(?:) 以防止按{}分割时 处理错乱
+                if (list.get(end).contains("(")) {
+                    if (curr != null) {
+                        list.add(start, wildcard(curr, new IntTuple(min, max)));
+                        end += 2;
+                        start = end;
+                    }else{
+                        end++;
+                        start = end;
+                    }
+                    curr = null;
+                    min = 1;
+                    max = 1;
+                    continue;
+                }
+
+                if (curr == null) {
+                    String tmpStr = list.remove(start);
+                    final String[] segs = tmpStr.split("[{}]");
+                    IntTuple times = segs.length > 1 ? range(segs[1]) : new IntTuple(1, 1);
+                    min = times.getM();
+                    max = times.getN();
+                    curr = segs[0];
+                    end++;
+                    continue;
+                }
+
+                String next = list.remove(start);
                 if (curr.equals(next)) {
                     // sequence [a-z] [a-z] 或 \d{3,6} \d{3,6}
                     if (!isBranch) {
-                        min *= 2;
-                        max *= 2;
+                        min += min;
+                        max += max;
                     }
+                    end++;
                     continue;
                 } else {
                     final String[] tmpSegs = next.split("[{}]");
@@ -365,9 +391,10 @@ public class Generalizer {
                     final IntTuple tmpTimes = tmpSegs.length > 1 ? range(tmpSegs[1]) : new IntTuple(1, 1);
                     // 不同类型 则保存并开始新一轮合并去重 如: [a-z]{3}与\\d{4}
                     if (!nextTmp.equals(curr)) {
-                        list.add(index, wildcard(curr, new IntTuple(min, max)));
+                        list.add(start, wildcard(curr, new IntTuple(min, max)));
                         curr = nextTmp;
-                        index++;
+                        start++;
+                        end = start;
                         min = tmpTimes.getM();
                         max = tmpTimes.getN();
                         continue;
@@ -378,8 +405,8 @@ public class Generalizer {
                         // 相似的取最大范围 如:\d{2,4} \d{3,6}会变成\d{2,6}
                         min = Math.min(min, tmpTimes.getM());
                         max = Math.max(max, tmpTimes.getN());
-                    }else{
-                        // 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{4,10}
+                    } else {
+                        // 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{5,10}
                         min = min + tmpTimes.getM();
                         max = max + tmpTimes.getN();
                     }
@@ -387,13 +414,16 @@ public class Generalizer {
             }
 
             // 处理最后的
-            list.add(index, wildcard(curr, new IntTuple(min, max)));
+            if (curr != null) {
+                list.add(start, wildcard(curr, new IntTuple(min, max)));
+            }
         }
 
         /**
          * 解析数字区间字符串
          * 如: 5或5,6
-         * @return 返回数字区间,如: [5,5]或[5,6]
+         *
+         * @return 返回数字区间, 如: [5,5]或[5,6]
          **/
         public static IntTuple range(String range) {
             final String[] minMax = range.split(",");
