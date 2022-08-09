@@ -6,8 +6,10 @@ import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import cn.pheker.regex.generator.core.parser.nodes.Id;
 import cn.pheker.regex.generator.core.parser.nodes.Numbers;
+import cn.pheker.regex.generator.core.parser.nodes.Sequence;
 import cn.pheker.regex.generator.misc.IntTuple;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,10 +20,11 @@ import java.util.stream.Collectors;
  * @date 2022/8/7 13:03
  * @desc 泛化器
  */
+@Slf4j
 public class Generalizer {
     private Node node;
     private static GeneratorConfig config;
-    
+
     private static String Empty = "";
     private static String Digit = "\\d";
     private static String Upper = "A-Z";
@@ -61,16 +64,16 @@ public class Generalizer {
             // 120-127
             Lower, Lower, Lower, "{", "|", "}", "~", Empty
     };
-    
+
     static String Letter = "[a-zA-z]";
     static String Word = "\\w";
     static String Extend = "[\\x80-\\xff]";
     static String Chinese = "[\\x4e00-\\x9fa5]";
     static String Line = ".";
     static String All = "[\\s\\S]";
-    
+
     static Map<String, String> levelTree = new HashMap<>();
-    
+
     static {
         levelTree.put(Digit, "\\d");
         levelTree.put(Lower, "[a-z]");
@@ -80,19 +83,19 @@ public class Generalizer {
             levelTree.put(c, "\\" + c);
         }
     }
-    
-    
+
+
     public static Generalizer of(Node node, GeneratorConfig config) {
         return new Generalizer(node, config);
     }
-    
+
     private Generalizer(Node node, GeneratorConfig config) {
         this.node = node;
         Generalizer.config = config;
     }
-    
+
     private Stack<Wrapper> stack = new Stack<>();
-    
+
     /**
      * 泛化
      *
@@ -101,11 +104,11 @@ public class Generalizer {
     public String generalize() {
         return this.doGeneralize(this.node);
     }
-    
+
     private String doGeneralize(Node target) {
         final Wrapper wrapper = Wrapper.of(target, null);
         stack.push(wrapper);
-        
+
         while (!stack.isEmpty()) {
             final Wrapper w = stack.pop();
             if (!w.isFinished()) {
@@ -114,7 +117,7 @@ public class Generalizer {
                 stack.push(Wrapper.of(child, w));
                 continue;
             }
-            
+
             final Node node = w.getNode();
             final Item item = new Item();
             item.clzz = node.getClass();
@@ -125,7 +128,7 @@ public class Generalizer {
             if (w.parent != null) {
                 w.parent.children.add(w);
             }
-            
+
             if (node.isLeaf()) {
                 item.regex = ((Leaf) node).getToken().getTok();
             } else if (node.isExtendsOf(Branches.class)) {
@@ -138,15 +141,15 @@ public class Generalizer {
                 }
             }
         }
-    
+
         Level rootLevel = wrapper.item.level;
         Level defaultLevel = Level.from(config.getMode().ordinal());
         Level level = Level.selectHigherLevel(rootLevel, defaultLevel);
         wrapper.generalize(level);
         return wrapper.getItem().regex;
     }
-    
-    
+
+
     @Data
     public static class Wrapper {
         private Node node;
@@ -159,7 +162,7 @@ public class Generalizer {
          * 直接使用item.regex,而不是通过generalize方法计算获取item.regex
          */
         private boolean useRegex = false;
-        
+
         public static Wrapper of(Node node, Wrapper parent) {
             final Wrapper wrapper = new Wrapper();
             wrapper.node = node;
@@ -170,30 +173,33 @@ public class Generalizer {
             }
             return wrapper;
         }
-        
+
         public boolean isRoot() {
             return parent == null;
         }
-        
+
         public boolean isFinished() {
             return curr >= size;
         }
-        
+
         public Node getChild() {
             return ((NonLeaf) node).children().get(curr++);
         }
-        
+
         private void generalize(Level currLevel) {
             if (node.isLeaf()) {
                 item.charLevelUp(currLevel);
                 return;
             }
+            this.prune();
+
             for (Wrapper wc : children) {
                 if (!wc.useRegex) {
                     wc.generalize(Level.selectHigherLevel(currLevel, wc.item.level));
                 }
             }
-            
+
+            // 分支通过|合并,且可能会用(?:)或()包裹
             if (node.isExtendsOf(Branches.class)) {
                 if (this.children.size() == 1) {
                     item.regex = this.children.get(0).item.regex;
@@ -203,12 +209,17 @@ public class Generalizer {
                             .map(Item::getRegex)
                             .collect(Collectors.toList());
                     distinct(list);
-                    String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
-                    item.regex = list.stream()
-                            .collect(Collectors.joining("|", groupPrefix, ")"));
+                    // 最外层不使用(?:)或()
+                    if (parent == null) {
+                        item.regex = list.stream().collect(Collectors.joining("|"));
+                    }else {
+                        String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
+                        item.regex = list.stream()
+                                .collect(Collectors.joining("|", groupPrefix, ")"));
+                    }
                 }
             } else {
-                // Sequence
+                // Sequence 串连子节点即可
                 if (node.isExtendsOf(Id.class)) {
                     IntTuple lens = item.getLens();
                     item.regex = wildcard(Word, lens);
@@ -230,7 +241,33 @@ public class Generalizer {
                 }
             }
         }
-        
+
+        /**
+         * 对Branches剪枝
+         * 条件:
+         * 1.分支仅出现一次, 且占所有分支出现次数比率小于容错率(一般为0.2)
+         * 2.分支的有子节点,且子节点不能全部为叶子节点
+         **/
+        private void prune() {
+            if (!this.node.isExtendsOf(Branches.class)) {
+                return;
+            }
+            final Integer max = item.times.getN();
+            final Iterator<Wrapper> ite = children.iterator();
+            while (ite.hasNext()) {
+                final Wrapper w = ite.next();
+                final int branchMax = w.getItem().getTimes().getN();
+                if (branchMax < 2 && branchMax * 1.0f / max <= config.getFaultRate()) {
+                    // 分支不是Sequence节点,或者Sequence分支的所有子节点不全部为叶子节点
+                    if (!w.node.isExtendsOf(Sequence.class)
+                            || !((Sequence) w.node).children().stream().allMatch(Node::isLeaf)) {
+                        ite.remove();
+                        log.info("prune-wrapper: {}", w);
+                    }
+                }
+            }
+        }
+
         private String wildcard(String re, IntTuple lens) {
             Integer min = lens.getM(), max = lens.getN();
             if (lens.same()) {
@@ -244,7 +281,7 @@ public class Generalizer {
                 }
             }
         }
-        
+
         public static void distinct(List<String> list) {
             if (list.isEmpty()) {
                 return;
@@ -273,13 +310,13 @@ public class Generalizer {
                 list.add(index, curr + "{" + count + "}");
             }
         }
-        
+
         @Override
         public String toString() {
-            return this.getClass().getSimpleName() + "{" + this.item + "}";
+            return this.getClass().getSimpleName() + "{node=" + this.node + ",item=" + this.item + "}";
         }
     }
-    
+
     @Data
     static class Item {
         private Class clzz;
@@ -287,7 +324,7 @@ public class Generalizer {
         private String regex;
         private IntTuple times;
         public IntTuple lens;
-        
+
         public void charLevelUp(Level currLevel) {
             String ch = regex;
             if (level.ordinal() >= currLevel.ordinal()) {
@@ -318,7 +355,7 @@ public class Generalizer {
                             regex = Chinese;
                         }
                     }
-                    
+
                     // [a-z]
                     if (regex != null) {
                         String rr = levelTree.get(regex);
@@ -346,36 +383,37 @@ public class Generalizer {
                     break;
             }
         }
-        
+
         @Override
         public String toString() {
             return "Item{" +
                     "level=" + level +
                     ", regex=" + regex +
+                    ", lens=" + lens +
                     ", times=" + times +
                     '}';
         }
     }
-    
+
     enum Level {
         LEVEL_0,
         LEVEL_1,
         LEVEL_2,
         LEVEL_3,
-        
+
         ;
-        
+
         public static Level selectHigherLevel(Level level, Level level2) {
             if (level.ordinal() > level2.ordinal()) {
                 return level;
             }
             return level2;
         }
-        
+
         public static Level higherLevel(Level level) {
             return from(level.ordinal() + 1);
         }
-        
+
         public static Level from(int level) {
             for (Level l : values()) {
                 if (l.ordinal() == level) {

@@ -1,8 +1,10 @@
 package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
+import cn.pheker.regex.generator.core.parser.GeneratorConfig;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
+import cn.pheker.regex.generator.core.parser.other.Mode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +39,9 @@ public class GeneralizerTest {
         }
         
         log.info("model: {}", model.format());
-        Generator gen = Generator.of(model);
+        final GeneratorConfig config = new GeneratorConfig();
+        config.setMode(Mode.Accurate);
+        Generator gen = Generator.of(model, config);
         log.info("gen: {}", gen.generate());
     }
     

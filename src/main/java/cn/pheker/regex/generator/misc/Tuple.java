@@ -12,9 +12,14 @@ import lombok.Getter;
 public abstract class Tuple<M, N> {
     protected M m;
     protected N n;
-    
+
     public Tuple(M m, N n) {
         this.m = m;
         this.n = n;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + m + "," + n + ")";
     }
 }

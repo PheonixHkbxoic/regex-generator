@@ -19,7 +19,7 @@ public class GeneratorConfig {
     /**
      * 容错率
      */
-    private float faultRate = 0.1f;
+    private float faultRate = 0.2f;
     
     /**
      * 最小升级分支数量

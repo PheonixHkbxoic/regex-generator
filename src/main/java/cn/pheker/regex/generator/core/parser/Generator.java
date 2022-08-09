@@ -14,10 +14,10 @@ import java.util.*;
  * @desc 生成器
  */
 public class Generator implements Iterable<String> {
-    private Model model;
+    private final Model model;
     private GeneratorConfig config;
 
-    private Map<String, List<String>> nodeRegexListCache = new HashMap<>(1);
+    private final Map<String, List<String>> nodeRegexListCache = new HashMap<>(1);
 
     public static Generator of(Model model) {
         return of(model, null);
@@ -55,15 +55,6 @@ public class Generator implements Iterable<String> {
             // 3.节点泛化
             Generalizer generalizer = Generalizer.of(cpNode, config);
             String regex = generalizer.generalize();
-            int sub = -1;
-            if (regex.startsWith("(?:")) {
-                sub = 3;
-            } else if (regex.startsWith("(")) {
-                sub = 1;
-            }
-            if (sub != -1) {
-                regex = regex.substring(sub, regex.length() - 1);
-            }
             List<String> regexList = Collections.singletonList(regex);
             // 再生成正则
 //            List<String> regexList = cpNode.generateRegex();

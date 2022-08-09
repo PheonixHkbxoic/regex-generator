@@ -148,7 +148,7 @@ public class MetaInfo {
     
     public IntTuple getMinMaxTimes() {
         Integer min = null, max = null;
-        for (Integer len : lenTimes.keySet()) {
+        for (Integer len : lenTimes.values()) {
             if (min == null) {
                 min = len;
             }
