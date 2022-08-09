@@ -29,13 +29,30 @@ graph LR
         C2--修正-->model
         C3--修正-->model
 
-        model--收集-->profile{{环境信息}}
+        model--收集-->profile{{元信息 如:长度,次数等}}
 
     end
 
+
     G{生成器}-.依赖.->model
     G-.依赖.->profile
-    G--合成,提取,剪枝,泛化,生成-->regex>正则]
+    G-->merger
+    subgraph 处理器链
+    	merger>合成器]
+    	-->prune>剪枝]
+    	-->generalize>泛化]
+    	-->generate>生成]
+    end
+    generate-->regex>正则]
+    
+    用户--第1步-->input(输入)
+    input-->T1
+    input-->T2
+    input-->T3
+    
+    用户---第2步-..->GC[配置或默认]-..->G
+    用户--第3步-->api(调用api生成正则)-->G
+    
 ```
 
 ## 待办列表
@@ -54,16 +71,16 @@ graph LR
 
 - [ ] 支持更多节点，如Id
 
-- [ ] 信息收集
+- [x] 信息收集
 
 #### 正则生成
 
 - [x] 基本生成
 
-- [ ] 节点复制
+- [x] 节点复制
 
 - [ ] 后缀提取
 
-- [ ] 节点剪枝
+- [x] 节点剪枝
 
-- [ ] 节点泛化
+- [x] 节点泛化
