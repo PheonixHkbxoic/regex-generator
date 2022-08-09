@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class Generalizer {
     private Node node;
     private static GeneratorConfig config;
-
+    
     private static String Empty = "";
     private static String Digit = "\\d";
     private static String Upper = "A-Z";
@@ -64,16 +64,16 @@ public class Generalizer {
             // 120-127
             Lower, Lower, Lower, "{", "|", "}", "~", Empty
     };
-
+    
     static String Letter = "[a-zA-z]";
     static String Word = "\\w";
     static String Extend = "[\\x80-\\xff]";
     static String Chinese = "[\\x4e00-\\x9fa5]";
     static String Line = ".";
     static String All = "[\\s\\S]";
-
+    
     static Map<String, String> levelTree = new HashMap<>();
-
+    
     static {
         levelTree.put(Digit, "\\d");
         levelTree.put(Lower, "[a-z]");
@@ -83,19 +83,19 @@ public class Generalizer {
             levelTree.put(c, "\\" + c);
         }
     }
-
-
+    
+    
     public static Generalizer of(Node node, GeneratorConfig config) {
         return new Generalizer(node, config);
     }
-
+    
     private Generalizer(Node node, GeneratorConfig config) {
         this.node = node;
         Generalizer.config = config;
     }
-
+    
     private Stack<Wrapper> stack = new Stack<>();
-
+    
     /**
      * 泛化
      *
@@ -104,11 +104,11 @@ public class Generalizer {
     public String generalize() {
         return this.doGeneralize(this.node);
     }
-
+    
     private String doGeneralize(Node target) {
         final Wrapper wrapper = Wrapper.of(target, null);
         stack.push(wrapper);
-
+        
         while (!stack.isEmpty()) {
             final Wrapper w = stack.pop();
             if (!w.isFinished()) {
@@ -117,7 +117,7 @@ public class Generalizer {
                 stack.push(Wrapper.of(child, w));
                 continue;
             }
-
+            
             final Node node = w.getNode();
             final Item item = new Item();
             item.clzz = node.getClass();
@@ -128,7 +128,7 @@ public class Generalizer {
             if (w.parent != null) {
                 w.parent.children.add(w);
             }
-
+            
             if (node.isLeaf()) {
                 item.regex = ((Leaf) node).getToken().getTok();
             } else if (node.isExtendsOf(Branches.class)) {
@@ -141,15 +141,15 @@ public class Generalizer {
                 }
             }
         }
-
+        
         Level rootLevel = wrapper.item.level;
         Level defaultLevel = Level.from(config.getMode().ordinal());
         Level level = Level.selectHigherLevel(rootLevel, defaultLevel);
         wrapper.generalize(level);
         return wrapper.getItem().regex;
     }
-
-
+    
+    
     @Data
     public static class Wrapper {
         private Node node;
@@ -162,7 +162,7 @@ public class Generalizer {
          * 直接使用item.regex,而不是通过generalize方法计算获取item.regex
          */
         private boolean useRegex = false;
-
+        
         public static Wrapper of(Node node, Wrapper parent) {
             final Wrapper wrapper = new Wrapper();
             wrapper.node = node;
@@ -173,60 +173,74 @@ public class Generalizer {
             }
             return wrapper;
         }
-
+        
         public boolean isRoot() {
             return parent == null;
         }
-
+        
         public boolean isFinished() {
             return curr >= size;
         }
-
+        
         public Node getChild() {
             return ((NonLeaf) node).children().get(curr++);
         }
-
+        
         private void generalize(Level currLevel) {
             if (node.isLeaf()) {
-                // 父级链里最近的Branches
+                // 查找父级链里最近的Branches
                 Wrapper curr = this;
-                while (!curr.node.isExtendsOf(Branches.class) && (curr = curr.getParent()) != null) {
+                while (!curr.node.isExtendsOf(Branches.class)
+                        && (curr = curr.getParent()) != null) {
                 }
-
+    
+                // 特殊情况 叶子节点如果在低级分支中占比较高时 不泛化
                 if (curr != null && curr != this) {
-                    // Single在Branches中占比大于0.7时 不进行泛化
+                    // Single在Branches中占比大于0.8时 不进行泛化
                     final Integer times = curr.getItem().getTimes().getM();
                     final Integer leafTimes = this.getItem().getTimes().getN();
                     if (leafTimes * 1.0f / times >= 0.7) {
                         return;
                     }
                 }
-
-                // 泛化
+    
+                // 字符泛化
                 item.charLevelUp(currLevel);
                 return;
             }
-
+            
+            // 剪枝
             this.prune();
-
+            
+            // 子节点泛化
             for (Wrapper wc : children) {
                 if (!wc.useRegex) {
                     wc.generalize(Level.selectHigherLevel(currLevel, wc.item.level));
                 }
             }
-
+            
+            // Branches或Sequence的子节点合并
             // 分支通过|合并,且可能会用(?:)或()包裹
             if (node.isExtendsOf(Branches.class)) {
-                if (this.children.size() == 1) {
-                    item.regex = this.children.get(0).item.regex;
+                List<String> list = this.children.stream()
+                        .map(Wrapper::getItem)
+                        .map(Item::getRegex)
+                        .collect(Collectors.toList());
+                distinct(list, true);
+                // 只有一个节点时 不使用(?:)或()
+                if (list.size() == 1) {
+                    item.regex = list.get(0);
                 } else {
-                    List<String> list = this.children.stream()
-                            .map(Wrapper::getItem)
-                            .map(Item::getRegex)
-                            .collect(Collectors.toList());
-                    distinctTwice(list, true);
-                    // 最外层不使用(?:)或()
-                    if (parent == null) {
+                    int lastIndex = list.size() - 1;
+                    String last = list.get(lastIndex);
+                    // 最后一个节点为Empty 则正则加? 表示可以没有
+                    if (last.equals(Empty)) {
+                        list.remove(lastIndex);
+                        String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
+                        item.regex = list.stream()
+                                .collect(Collectors.joining("|", groupPrefix, ")")) + "?";
+                        // 位于最外层时 不使用(?:)或()
+                    } else if (parent == null) {
                         item.regex = String.join("|", list);
                     } else {
                         String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
@@ -245,20 +259,21 @@ public class Generalizer {
                     IntTuple lens = item.getLens();
                     item.regex = wildcard(Digit, lens);
                     this.useRegex = true;
-                } else if (this.children.size() == 1) {
-                    item.regex = this.children.get(0).item.regex;
                 } else {
                     List<String> list = this.children.stream()
                             .map(Wrapper::getItem)
                             .map(Item::getRegex)
                             .collect(Collectors.toList());
-                    distinctTwice(list, false);
-                    item.regex = String.join("", list);
+                    distinct(list, false);
+                    if (this.children.size() == 1) {
+                        item.regex = list.get(0);
+                    } else {
+                        item.regex = String.join("", list);
+                    }
                 }
             }
-            log.debug("generalize-wrapper: {}", this);
         }
-
+        
         /**
          * 对Branches剪枝
          * 条件:
@@ -284,7 +299,7 @@ public class Generalizer {
                 }
             }
         }
-
+        
         public static String wildcard(String re, IntTuple lens) {
             Integer min = lens.getM(), max = lens.getN();
             if (lens.same()) {
@@ -301,7 +316,7 @@ public class Generalizer {
                 }
             }
         }
-
+        
         /**
          * 对list中相似的正则 压缩合并
          *
@@ -314,111 +329,67 @@ public class Generalizer {
          *                 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{5,10}
          **/
         public static void distinct(List<String> list, boolean isBranch) {
-            if (list.isEmpty()) {
-                return;
-            }
-            int index = 0, count = 1;
-            String curr = list.remove(0);
-            while (index < list.size()) {
-                String next = list.remove(index);
-                if (curr.equals(next)) {
-                    count++;
-                    continue;
-                } else {
-                    if (count == 1) {
-                        list.add(index, curr);
-                    } else {
-                        list.add(index, curr + "{" + count + "}");
-                    }
-                    curr = next;
-                    index++;
-                    count = 1;
-                }
-            }
-            if (count == 1) {
-                list.add(index, curr);
-            } else {
-                list.add(index, curr + "{" + count + "}");
-            }
-
-        }
-
-        public static void distinctTwice(List<String> list, boolean isBranch) {
-            int start = 0, end = 0;
+            int index = 0;
             String curr = null;
             int min = 1, max = 1;
-
-            while (end < list.size()) {
+    
+            while (index < list.size()) {
                 // 跳过组()和(?:) 以防止按{}分割时 处理错乱
-                if (list.get(end).contains("(")) {
+                if (list.get(index).contains("(")) {
                     if (curr != null) {
-                        list.add(start, wildcard(curr, new IntTuple(min, max)));
-                        end += 2;
-                        start = end;
-                    }else{
-                        end++;
-                        start = end;
+                        list.add(index, wildcard(curr, new IntTuple(min, max)));
+                        index += 2;
+                        curr = null;
+                        min = 1;
+                        max = 1;
+                    } else {
+                        index++;
                     }
-                    curr = null;
-                    min = 1;
-                    max = 1;
                     continue;
                 }
-
+        
                 if (curr == null) {
-                    String tmpStr = list.remove(start);
+                    String tmpStr = list.remove(index);
                     final String[] segs = tmpStr.split("[{}]");
                     IntTuple times = segs.length > 1 ? range(segs[1]) : new IntTuple(1, 1);
                     min = times.getM();
                     max = times.getN();
                     curr = segs[0];
-                    end++;
                     continue;
                 }
-
-                String next = list.remove(start);
-                if (curr.equals(next)) {
-                    // sequence [a-z] [a-z] 或 \d{3,6} \d{3,6}
-                    if (!isBranch) {
-                        min += min;
-                        max += max;
-                    }
-                    end++;
+        
+                String next = list.remove(index);
+                final String[] tmpSegs = next.split("[{}]");
+                String nextTmp = tmpSegs[0];
+                final IntTuple tmpTimes = tmpSegs.length > 1 ? range(tmpSegs[1]) : new IntTuple(1, 1);
+                // 不同类型 则保存并开始新一轮合并去重 如: [a-z]{3}与\\d{4}
+                if (!nextTmp.equals(curr)) {
+                    list.add(index, wildcard(curr, new IntTuple(min, max)));
+                    curr = nextTmp;
+                    index++;
+                    min = tmpTimes.getM();
+                    max = tmpTimes.getN();
                     continue;
+                }
+        
+                // branches [a-z]{3} [a-z]{6} == [a-z]{3,6}
+                if (isBranch) {
+                    // 相似的取最大范围 如:\d{2,4} \d{3,6}会变成\d{2,6}
+                    min = Math.min(min, tmpTimes.getM());
+                    max = Math.max(max, tmpTimes.getN());
                 } else {
-                    final String[] tmpSegs = next.split("[{}]");
-                    String nextTmp = tmpSegs[0];
-                    final IntTuple tmpTimes = tmpSegs.length > 1 ? range(tmpSegs[1]) : new IntTuple(1, 1);
-                    // 不同类型 则保存并开始新一轮合并去重 如: [a-z]{3}与\\d{4}
-                    if (!nextTmp.equals(curr)) {
-                        list.add(start, wildcard(curr, new IntTuple(min, max)));
-                        curr = nextTmp;
-                        start++;
-                        end = start;
-                        min = tmpTimes.getM();
-                        max = tmpTimes.getN();
-                        continue;
-                    }
-
-                    // branches [a-z]{3} [a-z]{6} == [a-z]{3,6}
-                    if (isBranch) {
-                        // 相似的取最大范围 如:\d{2,4} \d{3,6}会变成\d{2,6}
-                        min = Math.min(min, tmpTimes.getM());
-                        max = Math.max(max, tmpTimes.getN());
-                    } else {
-                        // 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{5,10}
-                        min = min + tmpTimes.getM();
-                        max = max + tmpTimes.getN();
-                    }
+                    // 相似的会累加后取最大范围 如:\d{2,4} \d{3,6}会变成\d{5,10}
+                    min = min + tmpTimes.getM();
+                    max = max + tmpTimes.getN();
                 }
             }
-
+    
             // 处理最后的
             if (curr != null) {
-                list.add(start, wildcard(curr, new IntTuple(min, max)));
+                list.add(index, wildcard(curr, new IntTuple(min, max)));
             }
         }
-
+        
         /**
          * 解析数字区间字符串
          * 如: 5或5,6
@@ -433,23 +404,28 @@ public class Generalizer {
             }
             return new IntTuple(min, max);
         }
-
+        
         @Override
         public String toString() {
             return this.getClass().getSimpleName() + "{node=" + this.node + ",item=" + this.item + "}";
         }
     }
-
+    
     @Data
     static class Item {
-        private Class clzz;
+        private Class<?> clzz;
         private Level level;
         private String regex;
         private IntTuple times;
         public IntTuple lens;
-
+        
+        // 128
+        private static final int MAX_ASCII = 0x80;
+        // 256
+        private static final int MAX_ASCII_EXTEND = 0xFF;
+        
         public void charLevelUp(Level currLevel) {
-            String ch = regex;
+            String chs = regex;
             if (level.ordinal() >= currLevel.ordinal()) {
                 return;
             }
@@ -458,37 +434,36 @@ public class Generalizer {
             }
             switch (currLevel) {
                 case LEVEL_0:
-                    regex = "";
-                    if (regex != null && regex.length() > 0) {
-                        final char c = regex.charAt(0);
-                        if (c <= 127) {
+                    if (chs != null && chs.length() > 0) {
+                        final char c = chs.charAt(0);
+                        if (c <= MAX_ASCII) {
                             regex = table[c];
                         }
                     }
                     break;
                 case LEVEL_1:
                     // 如 a-z
-                    if (regex != null && regex.length() > 0) {
-                        final char c = regex.charAt(0);
-                        if (c <= 127) {
+                    if (chs != null && chs.length() > 0) {
+                        final char c = chs.charAt(0);
+                        if (c <= MAX_ASCII) {
                             regex = table[c];
-                        } else if (c <= 256) {
+                        } else if (c <= MAX_ASCII_EXTEND) {
                             regex = Extend;
                         } else if (c >= 0x4e00 && c <= 0x9fa5) {
                             regex = Chinese;
                         }
                     }
-
+                    
                     // [a-z]
-                    if (regex != null) {
-                        String rr = levelTree.get(regex);
-                        if (rr != null && rr.length() > 0 && !regex.equals(rr)) {
-                            if (rr.contains(regex)) {
+                    if (chs != null) {
+                        String rr = levelTree.get(chs);
+                        if (rr != null && rr.length() > 0 && !chs.equals(rr)) {
+                            if (rr.contains(chs)) {
                                 regex = rr;
                             } else {
-                                if (regex.equals(Lower) && rr.equals(Upper)) {
+                                if (chs.equals(Lower) && rr.equals(Upper)) {
                                     regex = Letter;
-                                } else if (regex.equals(Digit) || regex.contains("_")) {
+                                } else if (chs.equals(Digit) || chs.contains("_")) {
                                     regex = Word;
                                 } else if (rr.contains("\r") || rr.contains("\n")) {
                                     regex = All;
@@ -506,7 +481,7 @@ public class Generalizer {
                     break;
             }
         }
-
+        
         @Override
         public String toString() {
             return "Item{" +
@@ -517,26 +492,26 @@ public class Generalizer {
                     '}';
         }
     }
-
+    
     enum Level {
         LEVEL_0,
         LEVEL_1,
         LEVEL_2,
         LEVEL_3,
-
+        
         ;
-
+        
         public static Level selectHigherLevel(Level level, Level level2) {
             if (level.ordinal() > level2.ordinal()) {
                 return level;
             }
             return level2;
         }
-
+        
         public static Level higherLevel(Level level) {
             return from(level.ordinal() + 1);
         }
-
+        
         public static Level from(int level) {
             for (Level l : values()) {
                 if (l.ordinal() == level) {

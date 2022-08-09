@@ -25,27 +25,38 @@ public class DistinctTest {
     public void testDistinctList() {
         List<String> arr = Arrays.asList("[a-z]", "[a-z]", "[A-Z]");
         List<String> list = new ArrayList<>(arr);
-        Generalizer.Wrapper.distinctTwice(list, true);
+        Generalizer.Wrapper.distinct(list, true);
         log.info("list branch: {}", list);
-
-        List<String> arr2 = Arrays.asList("[a-z]","[a-z]", "[A-Z]");
-        List<String> list2 = new ArrayList<>(arr2);
-        Generalizer.Wrapper.distinctTwice(list2, false);
+    
+        List<String> list2 = new ArrayList<>(arr);
+        Generalizer.Wrapper.distinct(list2, false);
         log.info("list sequence: {}", list2);
     }
     
 
     @Test
     public void testDistinctListComplex() {
-        List<String> arr = Arrays.asList("[a-z]","[a-z]{2,4}", "[A-Z]", "\\d{2,4}", "\\d{3,6}");
+        List<String> arr = Arrays.asList("[a-z]", "[a-z]{2,4}", "[A-Z]", "\\d{2,4}", "\\d{3,6}");
         List<String> list = new ArrayList<>(arr);
-        Generalizer.Wrapper.distinctTwice(list, true);
+        Generalizer.Wrapper.distinct(list, true);
         log.info("list branch: {}", list);
-
-        List<String> arr2 = Arrays.asList("[a-z]","[a-z]{2,4}", "[A-Z]", "\\d{2,4}", "\\d{3,6}");
-        List<String> list2 = new ArrayList<>(arr2);
-        Generalizer.Wrapper.distinctTwice(list2, false);
+    
+        List<String> list2 = new ArrayList<>(arr);
+        Generalizer.Wrapper.distinct(list2, false);
         log.info("list sequence: {}", list2);
     }
-
+    
+    
+    @Test
+    public void testDistinctListGroup() {
+        List<String> arr = Arrays.asList("\\d(?:\\d{7}|0{2})", "\\d{8}", "\\d{8}", "\\d{8}");
+        List<String> list = new ArrayList<>(arr);
+        Generalizer.Wrapper.distinct(list, true);
+        log.info("list branch: {}", list);
+        
+        List<String> list2 = new ArrayList<>(arr);
+        Generalizer.Wrapper.distinct(list2, false);
+        log.info("list sequence: {}", list2);
+    }
+    
 }

@@ -1,8 +1,10 @@
 package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
+import cn.pheker.regex.generator.core.parser.GeneratorConfig;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
+import cn.pheker.regex.generator.core.parser.other.Mode;
 import cn.pheker.regex.generator.core.scanner.LinesScanner;
 import cn.pheker.regex.generator.util.ResourceUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,8 @@ public class GuoyaozhuiziTest {
         LinesScanner scanner = new LinesScanner(path);
         final Model model = ModelBuilder.of(scanner).buildModel();
         log.info("testQueryWordsLib-model: {}", model.format());
+        GeneratorConfig config = new GeneratorConfig();
+        config.setMode(Mode.Generate);
         final List<String> regexList = Generator.of(model).generate();
         log.info("testQueryWordsLib-regexList: {}", regexList);
     }
