@@ -38,21 +38,20 @@ graph LR
     G-.依赖.->profile
     G-->merger
     subgraph 处理器链
-    	merger>合成器]
-    	-->prune>剪枝]
-    	-->generalize>泛化]
-    	-->generate>生成]
+        merger>合成器]
+        -->prune>剪枝]
+        -->generalize>泛化]
+        -->generate>生成]
     end
     generate-->regex>正则]
-    
+
     用户--第1步-->input(输入)
     input-->T1
     input-->T2
     input-->T3
-    
+
     用户---第2步-..->GC[配置或默认]-..->G
     用户--第3步-->api(调用api生成正则)-->G
-    
 ```
 
 ## 待办列表

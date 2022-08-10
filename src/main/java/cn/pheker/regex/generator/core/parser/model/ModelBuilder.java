@@ -1,9 +1,6 @@
 package cn.pheker.regex.generator.core.parser.model;
 
-import cn.pheker.regex.generator.core.scanner.Lines;
-import cn.pheker.regex.generator.core.scanner.LinesScanner;
-import cn.pheker.regex.generator.core.scanner.Scanner;
-import cn.pheker.regex.generator.core.scanner.StringScanner;
+import cn.pheker.regex.generator.core.scanner.*;
 import cn.pheker.regex.generator.exception.ParseException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,10 +35,10 @@ public class ModelBuilder {
     public static ModelBuilder of(Scanner scanner) {
         ModelBuilder builder = new ModelBuilder();
         builder.model = new Model();
-        if (scanner instanceof Lines) {
-            final List<String> lines = ((LinesScanner) scanner).readLines();
-            for (String line : lines) {
-                builder.proofread(new StringScanner(line));
+        if (scanner instanceof MultiScanner) {
+            final MultiScanner ms = (MultiScanner) scanner;
+            while (ms.hasNext()) {
+                builder.proofread(ms.next());
             }
             return builder;
         }
