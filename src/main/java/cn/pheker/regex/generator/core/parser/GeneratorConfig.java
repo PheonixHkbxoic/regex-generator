@@ -38,4 +38,10 @@ public class GeneratorConfig {
      * 当然,前提是最小长度为0时 才可能使用*,为1时才可能使用+
      */
     private int wildcardMinInterval = 3;
+
+    /**
+     * 空白分支是否转换成?, 默认转换
+     * 如果不转换,则空白分支将会移至末尾 作为最后一个分支
+     **/
+    private boolean convertBlankBranch = false;
 }

@@ -236,14 +236,20 @@ public class Generalizer {
                 if (list.size() == 1) {
                     item.regex = list.get(0);
                 } else {
-                    int lastIndex = list.size() - 1;
-                    String last = list.get(lastIndex);
-                    // 最后一个节点为Empty 则正则加? 表示可以没有
-                    if (last.equals(Empty)) {
-                        list.remove(lastIndex);
+                    // 存在空分支Empty 则正则加? 表示可以没有
+                    if (list.contains(Empty)) {
+                        list.remove(Empty);
+                        // 移到末尾
+                        if (!config.isConvertBlankBranch()) {
+                            list.add(Empty);
+                        }
                         String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
                         item.regex = list.stream()
-                                .collect(Collectors.joining("|", groupPrefix, ")")) + "?";
+                                .collect(Collectors.joining("|", groupPrefix, ")"));
+                        if (config.isConvertBlankBranch()) {
+                            item.regex += "?";
+                        }
+
                         // 位于最外层时 不使用(?:)或()
                     } else if (parent == null) {
                         item.regex = String.join("|", list);
