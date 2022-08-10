@@ -40,13 +40,13 @@ public class Generalizer {
             // 24-31
             Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty,
             // 32-39
-            Empty, "!", "\"", "#", "$", "%", "&", "'",
+            Empty, "!", "\"", "#", "\\$", "%", "&", "'",
             // 40-47
-            "(", ")", "*", "+", ",", "-", ".", "/",
+            "\\(", "\\)", "\\*", "\\+", ",", "\\-", "\\.", "\\/",
             // 48-55
             Digit, Digit, Digit, Digit, Digit, Digit, Digit, Digit,
             // 56-63
-            Digit, Digit, ":", ";", "<", "=", ">", "?",
+            Digit, Digit, ":", ";", "<", "=", ">", "\\?",
             // 64-71
             "@", Upper, Upper, Upper, Upper, Upper, Upper, Upper,
             // 72-79
@@ -54,7 +54,7 @@ public class Generalizer {
             // 80-87
             Upper, Upper, Upper, Upper, Upper, Upper, Upper, Upper,
             // 88-95
-            Upper, Upper, Upper, "[", "\\", "]", "^", "_",
+            Upper, Upper, Upper, "\\[", "\\\\", "\\]", "^", "_",
             // 96-103
             "`", Lower, Lower, Lower, Lower, Lower, Lower, Lower,
             // 104-111
@@ -62,7 +62,7 @@ public class Generalizer {
             // 112-119
             Lower, Lower, Lower, Lower, Lower, Lower, Lower, Lower,
             // 120-127
-            Lower, Lower, Lower, "{", "|", "}", "~", Empty
+            Lower, Lower, Lower, "\\{", "\\|", "\\}", "~", Empty
     };
     
     static String Letter = "[a-zA-z]";
@@ -200,6 +200,11 @@ public class Generalizer {
                     final Integer times = curr.getItem().getTimes().getM();
                     final Integer leafTimes = this.getItem().getTimes().getN();
                     if (leafTimes * 1.0f / times >= 0.7) {
+                        // 即使不泛化, 但元字符还是要转义的
+                        final String escapeSingle = levelTree.get(((Leaf) node).getToken().getTok());
+                        if (escapeSingle != null && escapeSingle.length() > 0) {
+                            item.regex = escapeSingle;
+                        }
                         return;
                     }
                 }
