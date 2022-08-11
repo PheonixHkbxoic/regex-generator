@@ -24,7 +24,7 @@ graph LR
         L3-->C3(上下文3)
         end
 
-        model[(模型)]    
+        model[(模型<br>即前缀树)]    
         C1--构造-->model
         C2--修正-->model
         C3--修正-->model
@@ -38,7 +38,7 @@ graph LR
     G-.依赖.->profile
     G-->merger
     subgraph 处理器链
-        merger>合成器]
+        merger>合成]
         -->prune>剪枝]
         -->generalize>泛化]
         -->generate>生成]
