@@ -26,7 +26,7 @@ public class ParagraphsScannerTest {
     public void testParagraphsScanner() {
         final String path = ResourceUtil.getResourcePath("paragraphs.txt");
         final ParagraphsScanner scanner = new ParagraphsScanner(path);
-        final Model model = ModelBuilder.of(scanner).buildModel();
+        final Model model = ModelBuilder.of(scanner).build();
         log.info("testParagraphsScanner-model: {}", model.format());
         final GeneratorConfig config = new GeneratorConfig();
         final Generator gen = Generator.of(model, config);
@@ -40,7 +40,7 @@ public class ParagraphsScannerTest {
         final byte[] bytes = FileUtil.readBytes(path);
         String text = new String(bytes);
         final StringParagraphsScanner scanner = new StringParagraphsScanner(text);
-        final Model model = ModelBuilder.of(scanner).buildModel();
+        final Model model = ModelBuilder.of(scanner).build();
         log.info("testStringParagraphsScanner-model: {}", model.format());
         final GeneratorConfig config = new GeneratorConfig();
         final Generator gen = Generator.of(model, config);

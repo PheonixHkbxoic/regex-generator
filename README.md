@@ -118,7 +118,7 @@ public class GeneralizerTest {
     private String text = "<Your Test Text>";
     @Test
     public void testGeneralizer() {
-        final Model model = ModelBuilder.of(text).buildModel();
+        final Model model = ModelBuilder.of(text).build();
         log.info("model: {}", model.format());
         
         Generator gen = Generator.of(model);

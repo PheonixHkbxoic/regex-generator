@@ -27,7 +27,7 @@ public class GuoyaozhuiziTest {
     public void testGuoyaozhuizi() {
         final String path = ResourceUtil.getResourcePath("guoyaozhuizi.txt");
         LinesScanner scanner = new LinesScanner(path);
-        final Model model = ModelBuilder.of(scanner).buildModel();
+        final Model model = ModelBuilder.of(scanner).build();
         log.info("testGuoyaozhuizi-model: {}", model.format());
         final List<String> regexList = Generator.of(model).generate();
         log.info("testGuoyaozhuizi-regexList: {}", regexList);
@@ -37,7 +37,7 @@ public class GuoyaozhuiziTest {
     public void testQueryWordsLib() {
         final String path = ResourceUtil.getResourcePath("query-words-lib.txt");
         LinesScanner scanner = new LinesScanner(path);
-        final Model model = ModelBuilder.of(scanner).buildModel();
+        final Model model = ModelBuilder.of(scanner).build();
         log.info("testQueryWordsLib-model: {}", model.format());
         GeneratorConfig config = new GeneratorConfig();
         config.setMode(Mode.Generate);

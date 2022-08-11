@@ -27,7 +27,7 @@ public class BlankTest {
                 "\t\t",
                 "\r\n\r\n"
         };
-        final Model model = ModelBuilder.of().buildModel();
+        final Model model = ModelBuilder.of().build();
         for (String line : lines) {
             model.proofread(line);
         }

@@ -31,7 +31,7 @@ public class GeneralizerTest {
                 "zj php 95\n" +
                 "93 zj js";
 
-        final Model model = ModelBuilder.of(text).buildModel();
+        final Model model = ModelBuilder.of(text).build();
         log.info("model: {}", model.format());
 
         Generator gen = Generator.of(model);

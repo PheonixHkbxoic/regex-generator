@@ -27,7 +27,7 @@ public class PhoneTest {
         String path = ResourceUtil.getResourcePath("phone.txt");
         LinesScanner scanner = new LinesScanner(path);
         ModelBuilder builder = ModelBuilder.of(scanner);
-        Model model = builder.buildModel();
+        Model model = builder.build();
         log.info("model: {}", model.format());
         GeneratorConfig config = new GeneratorConfig();
         config.setMode(Mode.Generate);

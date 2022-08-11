@@ -27,7 +27,7 @@ public class ModelBuilderTest {
         for (String str : targets()) {
             StringScanner scanner = new StringScanner(str);
             ModelBuilder builder = ModelBuilder.of(scanner);
-            Model model = builder.buildModel();
+            Model model = builder.build();
             log.info("model: {}", model.format());
         }
     }
@@ -56,7 +56,7 @@ public class ModelBuilderTest {
         final String path = ResourceUtil.getResourcePath("google_index.html");
         Scanner scanner = new TxtScanner(path);
         ModelBuilder builder = ModelBuilder.of(scanner);
-        Model model = builder.buildModel();
+        Model model = builder.build();
         log.info("model: {}", model.format());
         Generator gen = Generator.of(model);
         log.info("gen: {}", gen.generate());
@@ -67,7 +67,7 @@ public class ModelBuilderTest {
         final String path = ResourceUtil.getResourcePath("runoob.json");
         Scanner scanner = new TxtScanner(path);
         ModelBuilder builder = ModelBuilder.of(scanner);
-        Model model = builder.buildModel();
+        Model model = builder.build();
         log.info("model: {}", model.format());
         Generator gen = Generator.of(model);
         log.info("gen: {}", gen.generate());

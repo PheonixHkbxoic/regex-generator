@@ -27,7 +27,7 @@ public class GeneratorTest {
         final String text = "<div>abc</div>";
         StringScanner scanner = new StringScanner(text);
         ModelBuilder builder = ModelBuilder.of(scanner);
-        Model model = builder.buildModel();
+        Model model = builder.build();
         log.info("model: {}", model.format());
         final Generator gen = Generator.of(model);
         final Iterator<String> regexIte = gen.iterator();
