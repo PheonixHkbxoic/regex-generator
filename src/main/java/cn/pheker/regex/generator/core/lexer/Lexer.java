@@ -110,11 +110,11 @@ public class Lexer {
                 if (c > 127) {
                     return Token.of(TokenType.Extended, c);
                 } else if (c == '\t') {
-                    return Token.of(TokenType.HT, "\\t");
+                    return Token.of(TokenType.HT, c);
                 } else if (c == '\r') {
-                    return Token.of(TokenType.LF, "\\r");
+                    return Token.of(TokenType.CR, c);
                 } else if (c == '\n') {
-                    return Token.of(TokenType.CR, "\\n");
+                    return Token.of(TokenType.LF, c);
                 } else if (c == 127 || c < 9 || 10 < c && c < 13 || 13 < c && c < 32) {
                     return Token.of(TokenType.CONTROL, c);
                 } else if (TokenType.DIGIT.chs.contains(c + "")) {

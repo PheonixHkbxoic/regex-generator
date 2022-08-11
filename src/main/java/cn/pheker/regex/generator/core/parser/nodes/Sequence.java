@@ -23,17 +23,17 @@ import java.util.stream.Collectors;
  * @desc
  */
 public class Sequence extends AbstractComposite {
-    
-    
+
+
     public Sequence(NonLeaf parent) {
         super(parent);
     }
-    
+
     @Override
     public String toString() {
-        return "Sequence{" + children + '}';
+        return this.getClass().getSimpleName() + "{" + children + '}';
     }
-    
+
     @Override
     public List<String> generateRegex() {
         List<String> regex = null;
@@ -47,7 +47,7 @@ public class Sequence extends AbstractComposite {
             List<String> res = child.generateRegex();
             // accurate
             // mode = 0
-    
+
             int mode = 1;
             // generate
             if (mode == 1) {
@@ -55,7 +55,7 @@ public class Sequence extends AbstractComposite {
                 IntTuple minMaxTimes = metaInfo.getMinMaxTimes();
                 // 固定不变
                 if (minMaxTimes.same() && minMaxTimes.getM() > 1) {
-            
+
                 } else {
                     if (this.isLeaf()) {
                         Token token = ((Leaf) child).getToken();
@@ -66,7 +66,7 @@ public class Sequence extends AbstractComposite {
                 }
                 // extreme
             } else if (mode == 2) {
-        
+
             }
             regex = cartesian(regex, res);
             if (regex.size() > 10000) {
@@ -75,7 +75,7 @@ public class Sequence extends AbstractComposite {
         }
         return regex;
     }
-    
+
     private List<String> levelCompress(List<String> res) {
         return res.stream()
                 .map(re -> {
@@ -92,7 +92,7 @@ public class Sequence extends AbstractComposite {
                 })
                 .collect(Collectors.toList());
     }
-    
+
     public String levelUp(Token token) {
         String re = token.getTok();
         if (token.isTokenType(TokenType.DIGIT)) {

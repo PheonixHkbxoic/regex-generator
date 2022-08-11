@@ -57,9 +57,9 @@ public class Token {
     public static String escapeIfNeed(Token token) {
         switch (token.type) {
             case CR:
-                return "\\n";
-            case LF:
                 return "\\r";
+            case LF:
+                return "\\n";
             case Backslash:
                 return "\\\\";
             case DoubleQuote:

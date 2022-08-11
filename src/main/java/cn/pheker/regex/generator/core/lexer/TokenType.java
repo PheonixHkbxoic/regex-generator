@@ -8,17 +8,18 @@ package cn.pheker.regex.generator.core.lexer;
  */
 public enum TokenType {
     EOF(""),
-    
+
     // 控制字符 不可见
     // 0-8 11-12 13-31 127
     CONTROL(""),
+    // 9
     HT("\t"),
     // 10
-    LF("\r"),
+    LF("\n"),
     // 13
-    CR("\n"),
-    
-    
+    CR("\r"),
+
+
     // 可打印字符 可见
     // 32
     SPACE(" "),

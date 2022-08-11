@@ -143,6 +143,16 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
                         return rbn.isTrue();
                     }
                     break;
+
+                case CR:
+                case LF:
+                case SPACE:
+                case HT:
+                    final Blank blank = new Blank(this);
+                    blank.parse();
+                    this.add(blank);
+                    break;
+
                 default:
                     this.add(Single.of(this));
                     // K ::= ":"[Blank]V | "="[Blank]V
