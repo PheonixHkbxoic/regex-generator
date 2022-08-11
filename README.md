@@ -232,5 +232,6 @@ Branches{    MetaInfo{[(16,9),(17,9),(8,1),(9,9),(10,9),(12,9),(13,9),(14,9)]}
 2. 剪枝，没有达到**容错率**的分支会被剪掉
 
 3. 生成的正则，如下：
-   
-   `(?:pheker|zj) (?:java|english|golang|php) \d{2}`
+    ```regexp
+    (?:pheker|zj) (?:java|english|golang|php) \d{2}
+    ```
