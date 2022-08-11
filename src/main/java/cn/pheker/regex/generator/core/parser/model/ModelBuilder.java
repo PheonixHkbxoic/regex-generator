@@ -1,10 +1,10 @@
 package cn.pheker.regex.generator.core.parser.model;
 
-import cn.pheker.regex.generator.core.scanner.*;
+import cn.pheker.regex.generator.core.scanner.MultiScanner;
+import cn.pheker.regex.generator.core.scanner.Scanner;
+import cn.pheker.regex.generator.core.scanner.StringLinesScanner;
 import cn.pheker.regex.generator.exception.ParseException;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * @author cn.pheker
@@ -27,9 +27,7 @@ public class ModelBuilder {
     }
     
     public static ModelBuilder of(String text) {
-        ModelBuilder builder = new ModelBuilder();
-        builder.model = new Model();
-        return builder.proofread(new StringScanner(text));
+        return of(new StringLinesScanner(text));
     }
     
     public static ModelBuilder of(Scanner scanner) {
@@ -46,10 +44,18 @@ public class ModelBuilder {
     }
     
     public ModelBuilder proofread(String text) {
-        return this.proofread(new StringScanner(text));
+        return this.proofread(new StringLinesScanner(text));
     }
     
     public ModelBuilder proofread(Scanner scanner) {
+        if (scanner instanceof MultiScanner) {
+            final MultiScanner ms = (MultiScanner) scanner;
+            while (ms.hasNext()) {
+                this.proofread(ms.next());
+            }
+            return this;
+        }
+
         return proofread(model, scanner);
     }
     
