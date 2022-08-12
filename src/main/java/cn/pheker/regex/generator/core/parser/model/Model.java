@@ -5,8 +5,8 @@ import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.DeepFormat;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.nodes.Sequence;
-import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Scanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;

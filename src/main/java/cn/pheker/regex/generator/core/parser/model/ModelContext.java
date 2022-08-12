@@ -3,7 +3,7 @@ package cn.pheker.regex.generator.core.parser.model;
 import cn.pheker.regex.generator.core.lexer.Lexer;
 import cn.pheker.regex.generator.core.lexer.TokenType;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
-import cn.pheker.regex.generator.core.scanner.Scanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Scanner;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,9 +13,10 @@ import lombok.Getter;
 public class Token {
     public static Token EOF = of(TokenType.EOF, "");
     
+    Pos pos;
     TokenType type;
     String tok;
-    
+
     public static Token of(TokenType type, char ch) {
         return of(type, String.valueOf(ch));
     }
@@ -44,8 +45,8 @@ public class Token {
     
     @Override
     public String toString() {
-        return String.format("(%s, \"%s\")",
-                type, escapeIfNeed(this));
+        return String.format("(%s, %s, \"%s\")",
+                pos, type, escapeIfNeed(this));
     }
     
     /**

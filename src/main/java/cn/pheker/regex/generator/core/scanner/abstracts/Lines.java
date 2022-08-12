@@ -1,4 +1,4 @@
-package cn.pheker.regex.generator.core.scanner;
+package cn.pheker.regex.generator.core.scanner.abstracts;
 
 import java.util.List;
 

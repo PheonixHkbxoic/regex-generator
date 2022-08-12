@@ -1,5 +1,9 @@
 package cn.pheker.regex.generator.core.scanner;
 
+import cn.pheker.regex.generator.core.scanner.abstracts.Lines;
+import cn.pheker.regex.generator.core.scanner.abstracts.MultiScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Scanner;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +18,7 @@ public class LinesScanner extends TxtScanner implements Lines, MultiScanner {
     String line;
     public LinesScanner(String txtPath) {
         super(txtPath);
-        this.readLine();
+        this.line = this.readLine();
     }
 
     @Override
@@ -39,7 +43,11 @@ public class LinesScanner extends TxtScanner implements Lines, MultiScanner {
 
     @Override
     public Scanner next() {
+        final StringScanner scanner = new StringScanner(offset, offsetRow, this.line);
+        offset += line.length() + 1;
+        offsetRow++;
+
         line = readLine();
-        return new StringScanner(this.line);
+        return scanner;
     }
 }

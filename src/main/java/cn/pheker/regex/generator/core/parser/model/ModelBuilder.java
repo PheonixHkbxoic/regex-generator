@@ -1,8 +1,8 @@
 package cn.pheker.regex.generator.core.parser.model;
 
-import cn.pheker.regex.generator.core.scanner.MultiScanner;
-import cn.pheker.regex.generator.core.scanner.Scanner;
 import cn.pheker.regex.generator.core.scanner.StringLinesScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.MultiScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Scanner;
 import cn.pheker.regex.generator.exception.ParseException;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,5 +1,10 @@
 package cn.pheker.regex.generator.core.scanner;
 
+import cn.pheker.regex.generator.core.scanner.abstracts.AbstractScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Lines;
+import cn.pheker.regex.generator.core.scanner.abstracts.MultiScanner;
+import cn.pheker.regex.generator.core.scanner.abstracts.Scanner;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +15,7 @@ import java.util.stream.Collectors;
  * @date 2022-08-11 11:41:07
  * @desc
  */
-public class StringLinesScanner implements MultiScanner, Lines {
+public class StringLinesScanner extends AbstractScanner implements MultiScanner, Lines {
     private List<String> lines;
     private int index;
 
@@ -42,7 +47,10 @@ public class StringLinesScanner implements MultiScanner, Lines {
     @Override
     public Scanner next() {
         final String line = readLine();
+        final StringScanner scanner = new StringScanner(offset, offsetRow, line);
+        offset += line.length() + 1;
+        offsetRow++;
         index++;
-        return new StringScanner(line);
+        return scanner;
     }
 }

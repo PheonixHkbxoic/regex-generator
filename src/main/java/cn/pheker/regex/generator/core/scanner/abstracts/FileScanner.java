@@ -1,4 +1,4 @@
-package cn.pheker.regex.generator.core.scanner;
+package cn.pheker.regex.generator.core.scanner.abstracts;
 
 /**
  * @author cn.pheker
@@ -6,8 +6,7 @@ package cn.pheker.regex.generator.core.scanner;
  * @date 2022/7/25 21:26
  * @desc
  */
-public interface FileScanner extends Scanner {
-    
+public interface FileScanner {
+
     void setFilePath(String path);
-    
 }

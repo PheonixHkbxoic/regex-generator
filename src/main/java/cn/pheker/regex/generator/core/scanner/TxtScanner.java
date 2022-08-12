@@ -1,10 +1,9 @@
 package cn.pheker.regex.generator.core.scanner;
 
+import cn.pheker.regex.generator.core.scanner.abstracts.AbstractFileScanner;
 import cn.pheker.regex.generator.exception.FileException;
 
 import java.io.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author cn.pheker
@@ -12,26 +11,22 @@ import java.util.stream.Collectors;
  * @date 2022/7/25 21:28
  * @desc
  */
-public class TxtScanner implements FileScanner {
-    
-    String txtPath;
+public class TxtScanner extends AbstractFileScanner {
     protected BufferedReader reader;
-    // cache line
     private String cacheLine;
     private int cursor = 0;
     private boolean end = false;
-    
-    // cache array
-    private char[] cbuf = new char[1024];
+
+    private final char[] buf = new char[1024];
     int c = 0;
     int e = 0;
 
-    public TxtScanner(String txtPath) {
-        this.setFilePath(txtPath);
+    public TxtScanner(String path) {
+        this.setFilePath(path);
     }
 
     private void init() {
-        File file = new File(txtPath);
+        File file = new File(path);
         try {
             FileReader reader = new FileReader(file);
             this.reader = new BufferedReader(reader);
@@ -42,10 +37,11 @@ public class TxtScanner implements FileScanner {
     
     @Override
     public void setFilePath(String path) {
-        this.txtPath = path;
+        super.setFilePath(path);
         init();
     }
-    
+
+
     @Override
     public int read() {
         return readAndCache();
@@ -53,13 +49,13 @@ public class TxtScanner implements FileScanner {
     
     private int readAndCache() {
         if (c < e) {
-            return cbuf[c++];
+            return buf[c++];
         }
         try {
             c = 0;
-            e = reader.read(cbuf, 0, 1024);
+            e = reader.read(buf, 0, 1024);
             if (c < e) {
-                return cbuf[c++];
+                return buf[c++];
             }
         } catch (IOException ex) {
             ex.printStackTrace();

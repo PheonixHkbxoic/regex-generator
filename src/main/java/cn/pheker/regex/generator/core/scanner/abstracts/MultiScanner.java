@@ -1,4 +1,4 @@
-package cn.pheker.regex.generator.core.scanner;
+package cn.pheker.regex.generator.core.scanner.abstracts;
 
 import java.util.Iterator;
 
@@ -8,6 +8,6 @@ import java.util.Iterator;
  * @date 2022/8/10 14:16
  * 多扫描器
  */
-public interface MultiScanner extends Scanner, Iterator<Scanner> {
+public interface MultiScanner extends Iterator<Scanner> {
 
 }
