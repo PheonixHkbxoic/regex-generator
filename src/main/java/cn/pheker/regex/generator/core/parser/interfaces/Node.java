@@ -7,8 +7,6 @@ import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.model.ThreadLocalModelContext;
 
-import java.util.List;
-
 /**
  * @author cn.pheker
  * @version 1.0.0
@@ -145,9 +143,4 @@ public interface Node extends DeepFormat{
      */
     boolean parseSuccess();
     
-    /**
-     * 生成正则
-     * @return 生成的正则列表
-     **/
-    List<String> generateRegex();
 }

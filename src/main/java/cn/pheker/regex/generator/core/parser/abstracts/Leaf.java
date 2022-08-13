@@ -5,9 +5,6 @@ import cn.pheker.regex.generator.core.lexer.Token;
 import cn.pheker.regex.generator.core.lexer.TokenType;
 import cn.pheker.regex.generator.util.StrUtil;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author cn.pheker
  * @version 1.0.0
@@ -91,8 +88,4 @@ public abstract class Leaf extends AbstractNode {
         return token.hashCode();
     }
 
-    @Override
-    public List<String> generateRegex() {
-        return Collections.singletonList(token.getTok());
-    }
 }
