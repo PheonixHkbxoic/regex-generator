@@ -21,18 +21,29 @@ public class ModelBuilder {
     }
     
     public static ModelBuilder of() {
-        ModelBuilder builder = new ModelBuilder();
-        builder.model = new Model();
-        return builder;
+        return of(((String) null));
+    }
+    
+    public static ModelBuilder of(ModelInterceptor interceptor) {
+        return of(((String) null), interceptor);
     }
     
     public static ModelBuilder of(String text) {
-        return of(new StringLinesScanner(text));
+        return of(text, null);
+    }
+    
+    public static ModelBuilder of(String text, ModelInterceptor interceptor) {
+        return of(new StringLinesScanner(text), interceptor);
     }
     
     public static ModelBuilder of(Scanner scanner) {
+        return of(scanner, null);
+    }
+    
+    public static ModelBuilder of(Scanner scanner, ModelInterceptor interceptor) {
         ModelBuilder builder = new ModelBuilder();
         builder.model = new Model();
+        builder.model.interceptor = interceptor;
         if (scanner instanceof MultiScanner) {
             final MultiScanner ms = (MultiScanner) scanner;
             while (ms.hasNext()) {
@@ -48,6 +59,10 @@ public class ModelBuilder {
     }
     
     public ModelBuilder proofread(Scanner scanner) {
+        if (scanner == null) {
+            return this;
+        }
+    
         if (scanner instanceof MultiScanner) {
             final MultiScanner ms = (MultiScanner) scanner;
             while (ms.hasNext()) {
@@ -55,7 +70,7 @@ public class ModelBuilder {
             }
             return this;
         }
-
+    
         return proofread(model, scanner);
     }
     

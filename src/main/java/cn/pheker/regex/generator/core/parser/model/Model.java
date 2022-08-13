@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class Model implements DeepFormat {
     NonLeaf root = new Sequence(null);
     ModelMerger merger;
+    ModelInterceptor interceptor;
     
     public Model() {
         this.merger = new ModelMerger(this);
@@ -63,12 +64,19 @@ public class Model implements DeepFormat {
         ThreadLocalModelContext tlmc = ThreadLocalModelContext.of(mc);
         Sequence other = new Sequence(null);
         other.setContext(tlmc);
-        boolean success = other.parse();
-        if (success) {
+        boolean parseSuccess = other.parse();
+        boolean toMerge = parseSuccess;
+        if (interceptor != null) {
+            toMerge = interceptor.before(parseSuccess, this, other) && toMerge;
+        }
+        if (toMerge) {
             merger.merge(other);
             this.contextList.add(mc);
+            if (interceptor != null) {
+                interceptor.after(this);
+            }
         }
-        return success;
+        return parseSuccess;
     }
     
     
@@ -111,11 +119,11 @@ public class Model implements DeepFormat {
     
         return curr;
     }
-
+    
     public NonLeaf getRoot() {
         return root;
     }
-
+    
     public void setRoot(NonLeaf root) {
         this.root = root;
     }
