@@ -7,6 +7,7 @@ import cn.pheker.regex.generator.core.parser.nodes.Branches;
 import cn.pheker.regex.generator.core.parser.nodes.Id;
 import cn.pheker.regex.generator.core.parser.nodes.Numbers;
 import cn.pheker.regex.generator.core.parser.nodes.Sequence;
+import cn.pheker.regex.generator.core.parser.other.Mode;
 import cn.pheker.regex.generator.misc.IntTuple;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -126,7 +127,7 @@ public class Generalizer {
             item.clzz = node.getClass();
             item.times = node.getMetaInfo().getMinMaxTimes();
             item.lens = node.getMetaInfo().getMinMaxLen();
-            item.level = Level.LEVEL_0;
+            item.mode = Mode.Accurate;
             w.item = item;
             if (w.parent != null) {
                 w.parent.children.add(w);
@@ -136,18 +137,17 @@ public class Generalizer {
                 item.regex = ((Leaf) node).getToken().getTok();
             } else if (node.isExtendsOf(Branches.class)) {
                 // calc children's item
-                if (w.children.size() > config.getLevelUpBranchNum()) {
-                    item.level = Level.LEVEL_1;
+                if (w.children.size() > config.getModeUpgradeBranchNum()) {
+                    item.mode = Mode.Generate;
                 }
                 if (item.times.same()) {
-                    item.level = Level.LEVEL_0;
+                    item.mode = Mode.Accurate;
                 }
             }
         }
-
-        Level rootLevel = wrapper.item.level;
-        Level defaultLevel = Level.from(config.getMode().ordinal());
-        Level level = Level.selectHigherLevel(rootLevel, defaultLevel);
+    
+        Mode rootMode = wrapper.item.mode;
+        Mode level = Mode.higherMode(rootMode, config.getMode());
         wrapper.generalize(level);
         return wrapper.getItem().regex;
     }
@@ -180,23 +180,24 @@ public class Generalizer {
         public boolean isRoot() {
             return parent == null;
         }
-
+    
         public boolean isFinished() {
             return curr >= size;
         }
-
+    
         public Node getChild() {
             return ((NonLeaf) node).children().get(curr++);
         }
-
-        private void generalize(Level currLevel) {
+    
+        private void generalize(Mode currMode) {
             if (node.isLeaf()) {
                 // 查找父级链里最近的Branches
                 Wrapper curr = this;
                 while (!curr.node.isExtendsOf(Branches.class)
                         && (curr = curr.getParent()) != null) {
+                    // continue
                 }
-
+            
                 // 特殊情况 叶子节点如果在低级分支中占比较高时 不泛化
                 if (curr != null && curr != this) {
                     // Single在Branches中占比大于0.8时 不进行泛化
@@ -211,23 +212,33 @@ public class Generalizer {
                         return;
                     }
                 }
-
+            
                 // 字符泛化
-                item.charLevelUp(currLevel);
+                item.charModeUp(currMode);
                 return;
             }
-
+        
             // 剪枝
             this.prune();
-
+        
             // 子节点泛化
             for (Wrapper wc : children) {
                 if (!wc.useRegex) {
-                    wc.generalize(Level.selectHigherLevel(currLevel, wc.item.level));
+                    wc.generalize(Mode.higherMode(currMode, wc.item.mode));
                 }
             }
-
+        
             // Branches或Sequence的子节点合并
+            this.generalizeNonLeaf(currMode);
+        }
+    
+        /**
+         * 泛化非叶子节点
+         * 主要是Branches,各种Sequence
+         *
+         * @param currMode 当前节点模式
+         */
+        private void generalizeNonLeaf(Mode currMode) {
             // 分支通过|合并,且可能会用(?:)或()包裹
             if (node.isExtendsOf(Branches.class)) {
                 List<String> list = this.children.stream()
@@ -247,7 +258,7 @@ public class Generalizer {
                         if (!config.isConvertBlankBranch()) {
                             list.add(Empty);
                         }
-
+                    
                         String groupPrefix = config.isUseCapturedGroup() ? "(" : "(?:";
                         item.regex = list.stream()
                                 .collect(Collectors.joining("|", groupPrefix, ")"));
@@ -294,7 +305,7 @@ public class Generalizer {
                 }
             }
         }
-
+    
         /**
          * 对Branches剪枝
          * 条件:
@@ -435,26 +446,26 @@ public class Generalizer {
     @Data
     static class Item {
         private Class<?> clzz;
-        private Level level;
+        private Mode mode;
         private String regex;
         private IntTuple times;
         public IntTuple lens;
-
+    
         // 128
         private static final int MAX_ASCII = 0x80;
         // 256
         private static final int MAX_ASCII_EXTEND = 0xFF;
-
-        public void charLevelUp(Level currLevel) {
+    
+        public void charModeUp(Mode currMode) {
             String chs = regex;
-            if (level.ordinal() >= currLevel.ordinal()) {
+            if (mode.ordinal() >= currMode.ordinal()) {
                 return;
             }
-            if (level.ordinal() < currLevel.ordinal() - 1) {
-                charLevelUp(Level.higherLevel(level));
+            if (mode.ordinal() < currMode.ordinal() - 1) {
+                charModeUp(Mode.higherMode(mode));
             }
-            switch (currLevel) {
-                case LEVEL_0:
+            switch (currMode) {
+                case Accurate:
                     if (chs != null && chs.length() > 0) {
                         final char c = chs.charAt(0);
                         if (c <= MAX_ASCII) {
@@ -462,7 +473,7 @@ public class Generalizer {
                         }
                     }
                     break;
-                case LEVEL_1:
+                case Generate:
                     // 如 a-z
                     if (chs != null && chs.length() > 0) {
                         final char c = chs.charAt(0);
@@ -506,40 +517,12 @@ public class Generalizer {
         @Override
         public String toString() {
             return "Item{" +
-                    "level=" + level +
+                    "level=" + mode +
                     ", regex=" + regex +
                     ", lens=" + lens +
                     ", times=" + times +
                     '}';
         }
     }
-
-    enum Level {
-        LEVEL_0,
-        LEVEL_1,
-        LEVEL_2,
-        LEVEL_3,
-
-        ;
-
-        public static Level selectHigherLevel(Level level, Level level2) {
-            if (level.ordinal() > level2.ordinal()) {
-                return level;
-            }
-            return level2;
-        }
-
-        public static Level higherLevel(Level level) {
-            return from(level.ordinal() + 1);
-        }
-
-        public static Level from(int level) {
-            for (Level l : values()) {
-                if (l.ordinal() == level) {
-                    return l;
-                }
-            }
-            return level > LEVEL_3.ordinal() ? LEVEL_3 : LEVEL_0;
-        }
-    }
+    
 }

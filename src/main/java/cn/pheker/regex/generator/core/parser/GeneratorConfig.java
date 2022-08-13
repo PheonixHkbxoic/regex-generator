@@ -23,9 +23,9 @@ public class GeneratorConfig {
     
     /**
      * 最小升级分支数量
-     * 即分支数量达到levelUpBranchNum时考虑升级
+     * 即分支数量达到modeUpgradeBranchNum时考虑升级
      */
-    private int levelUpBranchNum = 3;
+    private int modeUpgradeBranchNum = 3;
     
     /**
      * 分支默认使用捕获组;
