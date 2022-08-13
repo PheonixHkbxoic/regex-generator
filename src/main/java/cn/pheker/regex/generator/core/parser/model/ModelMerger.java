@@ -10,6 +10,8 @@ import cn.pheker.regex.generator.core.parser.nodes.Pair;
 import cn.pheker.regex.generator.core.parser.nodes.Sequence;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,17 +89,17 @@ public class ModelMerger {
                         if (mergeSuccess) {
                             break;
                         }
-                    
+    
                     }
                 }
-            
+    
                 // 结构都不类似,则作为新分支
                 if (!mergeSuccess) {
                     branches.add(second);
                 }
                 return true;
             }
-        
+    
             // Sequence     + Leaf
             // Leaf         + Sequence
             mergeAsBranches(first, second);
@@ -145,9 +147,9 @@ public class ModelMerger {
         } else {
             final Branches branches = new Branches(first.getParent());
             final List<Node> children = branches.children();
+            this.replaceInParent(first, branches);
             children.add(first);
             children.add(second);
-            this.replaceInParent(first, branches);
         }
     }
     
@@ -182,16 +184,19 @@ public class ModelMerger {
             // 发现这是个分支节点 那么这个分支节点一定是最后一个节点
             if (firstSub.isExtendsOf(Branches.class)) {
                 List<Node> nodes = s2.children().subList(i, s2.size());
-                this.doMerge(firstSub, newSequence(nodes));
+                Class<? extends NonLeaf> container = i == 0 ? s2.getClass() : Sequence.class;
+                this.doMerge(firstSub, newNonLeafOf(container, nodes));
                 return true;
             }
     
             // 因为如果节点不同的话  会合并成一个Branches节点
             List<Node> nodes1 = removeFrom(s1.children(), i, firstEndIndex);
-            Node firstBranch = nodes1.isEmpty() ? new Empty(null) : newSequence(nodes1);
+            Node firstBranch = nodes1.isEmpty() ? new Empty(null)
+                    : newNonLeafOf(i == 0 ? s1.getClass() : Sequence.class, nodes1);
             List<Node> nodes2 = removeFrom(s2.children(), i, secondEndIndex);
-            Node secondBranch = nodes2.isEmpty() ? new Empty(null) : newSequence(nodes2);
-            Branches branches = newBranches(s1, firstBranch, secondBranch);
+            Node secondBranch = nodes2.isEmpty() ? new Empty(null)
+                    : newNonLeafOf(i == 0 ? s2.getClass() : Sequence.class, nodes2);
+            Branches branches = newBranches(firstBranch, secondBranch);
             s1.add(branches);
             return true;
         }
@@ -207,8 +212,7 @@ public class ModelMerger {
             }
             Node empty = new Empty(null);
             Node branch = newSequence(longer);
-            Branches branches = newBranches(s1, branch, empty);
-            branches.setParent(s1);
+            Branches branches = newBranches(branch, empty);
             // 注意是添加到最后
             s1.add(branches);
         }
@@ -257,7 +261,7 @@ public class ModelMerger {
             Node firstBranch = nodes1.isEmpty() ? new Empty(null) : newSequence(nodes1);
             List<Node> nodes2 = removeFrom(secondPair.children(), i, secondEndIndex);
             Node secondBranch = nodes2.isEmpty() ? new Empty(null) : newSequence(nodes2);
-            Branches branches = newBranches(firstPair, firstBranch, secondBranch);
+            Branches branches = newBranches(firstBranch, secondBranch);
             branches.setParent(firstPair);
             // 注意是添加到最后一个节点End前
             firstPair.children().add(i, branches);
@@ -274,14 +278,14 @@ public class ModelMerger {
             }
             Node branch = newSequence(longer);
             Node empty = new Empty(null);
-            Branches branches = newBranches(firstPair, branch, empty);
+            Branches branches = newBranches(branch, empty);
             branches.setParent(firstPair);
             firstPair.children().add(minLen, branches);
         }
     }
     
-    private Branches newBranches(NonLeaf parent, Node... nodes) {
-        Branches branches = new Branches(parent);
+    private Branches newBranches(Node... nodes) {
+        Branches branches = new Branches(null);
         for (Node node : nodes) {
             branches.add(node);
         }
@@ -320,6 +324,28 @@ public class ModelMerger {
         return sequence;
     }
     
+    
+    /**
+     * 创建Sequence并添加子节点
+     *
+     * @param children 子节点
+     * @return 新Sequence
+     */
+    private NonLeaf newNonLeafOf(Class<? extends NonLeaf> nodeClass, List<Node> children) {
+        NonLeaf sequence = null;
+        try {
+            Constructor<? extends NonLeaf> con = nodeClass.getDeclaredConstructor(NonLeaf.class);
+            con.setAccessible(true);
+            sequence = con.newInstance((NonLeaf) null);
+            for (Node child : children) {
+                sequence.add(child);
+            }
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return sequence;
+    }
+    
     /**
      * 合并first、second作为Branches,
      * 并将first的父节点作为branches的父节点, branches将替换将first并占据其位置
@@ -335,12 +361,13 @@ public class ModelMerger {
         }
     
         // 合并为Branches
-        Branches branches = new Branches(first.getParent());
+        Branches branches = new Branches(null);
+        // Branches 占据first在父类中的位置(好比夺舍后双魂共存,再认贼作父)
+        replaceInParent(first, branches);
+    
         branches.add(first);
         branches.add(second);
     
-        // Branches 占据first在父类中的位置(好比夺舍后双魂共存,再认贼作父)
-        replaceInParent(first, branches);
     }
     
     
@@ -367,8 +394,13 @@ public class ModelMerger {
         if (node.isRoot()) {
             return;
         }
-        final int index = indexInParent(node);
-        final NonLeaf pNode = node.getParent();
+    
+        NonLeaf pNode = node.getParent();
+        int index = indexInParent(node);
+        while (index == 0) {
+            index = indexInParent(pNode);
+            pNode = pNode.getParent();
+        }
         replaceNode.setParent(pNode);
         pNode.children().set(index, replaceNode);
     }

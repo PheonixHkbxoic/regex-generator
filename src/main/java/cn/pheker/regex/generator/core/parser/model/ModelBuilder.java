@@ -33,6 +33,9 @@ public class ModelBuilder {
     }
     
     public static ModelBuilder of(String text, ModelInterceptor interceptor) {
+        if (text == null) {
+            return of(((Scanner) null), interceptor);
+        }
         return of(new StringLinesScanner(text), interceptor);
     }
     
