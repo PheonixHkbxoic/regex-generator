@@ -1,7 +1,10 @@
 package cn.pheker.regex.generator.test.nodes;
 
+import cn.pheker.regex.generator.core.parser.Generator;
+import cn.pheker.regex.generator.core.parser.GeneratorConfig;
 import cn.pheker.regex.generator.core.parser.model.Model;
 import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
+import cn.pheker.regex.generator.core.parser.other.Mode;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -28,9 +31,18 @@ public class IdTest {
 
     @Test
     public void testId() {
-        final String text = rg.generate();
-        final Model model = ModelBuilder.of(text).build();
-        log.info("testId-text: {}, 模型如下:{}", text, model.format());
+        final Model model = ModelBuilder.of().build();
+        for (int i = 0; i < 10; i++) {
+            String text = rg.generate();
+            log.info("proofread text: {}", text);
+            model.proofread(text);
+        }
+        log.info("testId-model:{}", model.format());
+    
+        GeneratorConfig config = new GeneratorConfig();
+        config.setMode(Mode.Accurate);
+        Generator gen = Generator.of(model);
+        log.info("regex: {}", gen.generate());
     }
 
 }
