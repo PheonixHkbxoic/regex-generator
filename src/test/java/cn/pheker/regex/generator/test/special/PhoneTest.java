@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * @author wanghaijun
+ * @author cn.pheker
  * @version 1.0.0
  * @date 2022/8/9 22:35
  * @desc
@@ -21,7 +21,7 @@ import org.junit.runners.JUnit4;
 @Slf4j
 @RunWith(JUnit4.class)
 public class PhoneTest {
-    
+
     @Test
     public void testPhone() {
         String path = ResourceUtil.getResourcePath("phone.txt");
