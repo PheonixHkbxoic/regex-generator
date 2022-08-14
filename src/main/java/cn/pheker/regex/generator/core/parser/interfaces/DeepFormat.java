@@ -10,6 +10,7 @@ public interface DeepFormat {
 
     /**
      * 按深度格式化
+     *
      * @return 格式化后的字符串
      **/
     String format();

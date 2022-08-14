@@ -19,5 +19,5 @@ public interface Paragraphs {
      * 读取所有段落
      **/
     List<String> readParagraphs();
-    
+
 }

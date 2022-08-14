@@ -16,7 +16,7 @@ public class Id extends Sequence {
     public Id(NonLeaf parent) {
         super(parent);
     }
-    
+
     @Override
     public boolean parse() {
         Lexer lexer = context.getLexer();

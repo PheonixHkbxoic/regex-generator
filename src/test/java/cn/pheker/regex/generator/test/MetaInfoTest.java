@@ -20,14 +20,14 @@ import java.util.List;
 @Slf4j
 @RunWith(JUnit4.class)
 public class MetaInfoTest {
-    
+
     @Test
     public void testMetaInfo() {
         List<String> lines = Arrays.asList(
-                "div"
-                , "di"
-                , "dicp"
-                , "cps"
+            "div"
+            , "di"
+            , "dicp"
+            , "cps"
         );
         Model model = ModelBuilder.of().build();
         for (String line : lines) {
@@ -37,5 +37,5 @@ public class MetaInfoTest {
         final Generator gen = Generator.of(model);
         log.info("after regex: {}", gen.generate());
     }
-    
+
 }

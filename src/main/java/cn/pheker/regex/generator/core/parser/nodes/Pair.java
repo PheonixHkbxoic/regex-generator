@@ -22,39 +22,39 @@ public class Pair extends Sequence {
      * 开始结点
      */
     protected Node start;
-    
+
     /**
      * 结束结点
      */
     protected Node end;
-    
+
     public Pair(NonLeaf parent) {
         super(parent);
     }
-    
-    
+
+
     public Node getStart() {
         return start;
     }
-    
+
     public Node getEnd() {
         return end;
     }
-    
+
     public boolean isStartEqualEnd() {
         return start == end;
     }
-    
+
     protected void setStart() {
         start = Single.of(this);
         this.add(start);
     }
-    
+
     protected void setEnd() {
         end = Single.of(this);
         this.add(end);
     }
-    
+
     @Override
     public boolean parse() {
         Lexer lexer = context.getLexer();
@@ -99,35 +99,35 @@ public class Pair extends Sequence {
                         return true;
                     }
                     return false;
-                
+
                 case DoubleQuote:
                 case Apostrophe:
                     if (start.isLeafTokenType(type)) {
                         this.setEnd();
                         return true;
                     }
-                    
+
                     return super.parse();
                 default:
                     // pair没结束, 所以无论后面处理成功与否 都要返回
                     return super.parse();
             }
         }
-        
+
         return this.parseSuccess();
     }
-    
-    
+
+
     @Override
     public String toString() {
         return StrUtil.times(this.getDeep())
-                + "Pair{" +
-                "start=" + start +
-                ", end=" + end +
-                ", children=" + children +
-                '}';
+            + "Pair{" +
+            "start=" + start +
+            ", end=" + end +
+            ", children=" + children +
+            '}';
     }
-    
+
     @Override
     public boolean parseSuccess() {
         return end != null;

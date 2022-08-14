@@ -192,8 +192,8 @@ public class Numbers extends Sequence {
         }
         return true;
     }
-    
-    
+
+
     private boolean isInvalid(Token token) {
         if (token.isTokenType(EOF)) {
             return true;

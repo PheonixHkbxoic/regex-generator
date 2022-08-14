@@ -22,18 +22,18 @@ import java.util.List;
 @Slf4j
 @RunWith(JUnit4.class)
 public class ModelProofreadTest2 {
-    
+
     @Test
     public void testProofread2() {
         List<String> lines = Arrays.asList(
-                "div",
-                "dc",
-                "dicp",
-                "divp",
-                "cp",
-                "cip",
-                "civp",
-                "faq"
+            "div",
+            "dc",
+            "dicp",
+            "divp",
+            "cp",
+            "cip",
+            "civp",
+            "faq"
         );
         Model model = ModelBuilder.of().build();
         for (String line : lines) {
@@ -45,14 +45,14 @@ public class ModelProofreadTest2 {
         final Generator gen = Generator.of(model, config);
         log.info("after regex: {}", gen.generate());
     }
-    
-    
+
+
     @Test
     public void testProofread3() {
         List<String> lines = Arrays.asList(
-                "div",
+            "div",
 //                "di",
-                "divc"
+            "divc"
         );
         Model model = ModelBuilder.of().build();
         for (String line : lines) {
@@ -62,14 +62,14 @@ public class ModelProofreadTest2 {
         final Generator gen = Generator.of(model);
         log.info("after regex: {}", gen.generate());
     }
-    
+
     @Test
     public void testProofread4() {
         List<String> lines = Arrays.asList(
-                "di",
-                "cp",
-                "cv",
-                "dx"
+            "di",
+            "cp",
+            "cv",
+            "dx"
         );
         Model model = ModelBuilder.of().build();
         for (String line : lines) {
@@ -79,6 +79,6 @@ public class ModelProofreadTest2 {
         final Generator gen = Generator.of(model);
         log.info("after regex: {}", gen.generate());
     }
-    
-    
+
+
 }

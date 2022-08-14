@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
  */
 public class LinesScanner extends TxtScanner implements Lines, MultiScanner {
     String line;
+
     public LinesScanner(String txtPath) {
         super(txtPath);
         this.line = this.readLine();
@@ -30,7 +31,7 @@ public class LinesScanner extends TxtScanner implements Lines, MultiScanner {
         }
         return null;
     }
-    
+
     @Override
     public List<String> readLines() {
         return reader.lines().collect(Collectors.toList());

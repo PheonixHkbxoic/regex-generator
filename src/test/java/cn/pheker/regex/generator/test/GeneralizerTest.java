@@ -21,15 +21,15 @@ public class GeneralizerTest {
     @Test
     public void testGeneralizer() {
         String text = "pheker java 78\n" +
-                "pheker english 55\n" +
-                "pheker english 55\n" +
-                "pheker golang 88\n" +
-                "pheker golang 88\n" +
-                "pheker golang 88\n" +
-                "pheker golang 88\n" +
-                "zj java 15\n" +
-                "zj php 95\n" +
-                "93 zj js";
+            "pheker english 55\n" +
+            "pheker english 55\n" +
+            "pheker golang 88\n" +
+            "pheker golang 88\n" +
+            "pheker golang 88\n" +
+            "pheker golang 88\n" +
+            "zj java 15\n" +
+            "zj php 95\n" +
+            "93 zj js";
 
         final Model model = ModelBuilder.of(text).build();
         log.info("model: {}", model.format());
@@ -37,5 +37,5 @@ public class GeneralizerTest {
         Generator gen = Generator.of(model);
         log.info("gen: {}", gen.generate());
     }
-    
+
 }

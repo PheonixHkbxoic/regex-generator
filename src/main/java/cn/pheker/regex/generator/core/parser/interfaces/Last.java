@@ -7,7 +7,7 @@ package cn.pheker.regex.generator.core.parser.interfaces;
  * @desc 获取最后一个元素
  */
 public interface Last<T> {
-    
+
     /**
      * 获取最后一个元素
      *
@@ -17,6 +17,7 @@ public interface Last<T> {
 
     /**
      * 删除最后一个
+     *
      * @return 存在并删除返回true, 否则返回false
      **/
     boolean removeLast();

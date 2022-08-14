@@ -38,7 +38,7 @@ public class IdTest {
             model.proofread(text);
         }
         log.info("testId-model:{}", model.format());
-    
+
         GeneratorConfig config = new GeneratorConfig();
         config.setMode(Mode.Accurate);
         Generator gen = Generator.of(model);

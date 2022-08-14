@@ -18,7 +18,7 @@ public class DotX extends Sequence {
     public DotX(NonLeaf parent) {
         super(parent);
     }
-    
+
     @Override
     public boolean parse() {
         add(Single.of(this));
@@ -37,7 +37,7 @@ public class DotX extends Sequence {
                         super.parse();
                         break;
                     }
-        
+
                     // 第一个非数字  按id处理
                     final Id id = new Id(this);
                     id.parse();

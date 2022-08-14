@@ -124,7 +124,7 @@ public class Lexer {
      */
     private Token doRead() {
         int ch;
-        while ((ch = scanner.read()) != -1) {
+        if ((ch = scanner.read()) != -1) {
             char c = (char) ch;
             if (c < 256) {
                 if (c > 127) {

@@ -23,16 +23,16 @@ public class Model implements DeepFormat {
     NonLeaf root = new Sequence(null);
     ModelMerger merger;
     ModelInterceptor interceptor;
-    
+
     Model() {
         this.merger = new ModelMerger(this);
     }
-    
+
     /**
      * 应用过的模型上下文列表
      */
     List<ModelContext> contextList = new ArrayList<>();
-    
+
     /**
      * 通过文本校正模型
      *
@@ -42,7 +42,7 @@ public class Model implements DeepFormat {
     public boolean proofread(String text) {
         return this.proofread(new StringScanner(text));
     }
-    
+
     /**
      * 通过扫描器 校正模型
      *
@@ -53,7 +53,7 @@ public class Model implements DeepFormat {
         ModelContext mc = ModelContext.of(scanner);
         return this.proofread(mc);
     }
-    
+
     /**
      * 通过上下文 校正模型
      *
@@ -78,17 +78,17 @@ public class Model implements DeepFormat {
         }
         return parseSuccess;
     }
-    
-    
+
+
     @Override
     public String format() {
         return String.format("\n=================================== 模型 ===================================\n" +
-                        "%s" +
-                        "============================================================================",
-                root.format());
+                "%s" +
+                "============================================================================",
+            root.format());
     }
-    
-    
+
+
     /**
      * 根据节点id查找节点
      *
@@ -99,8 +99,8 @@ public class Model implements DeepFormat {
             return null;
         }
         final List<Integer> indices = Arrays.stream(nodeId.split("-"))
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
+            .map(Integer::valueOf)
+            .collect(Collectors.toList());
         indices.remove(0);
         if (indices.isEmpty()) {
             return root;
@@ -116,14 +116,14 @@ public class Model implements DeepFormat {
                 break;
             }
         }
-    
+
         return curr;
     }
-    
+
     public NonLeaf getRoot() {
         return root;
     }
-    
+
     public void setRoot(NonLeaf root) {
         this.root = root;
     }

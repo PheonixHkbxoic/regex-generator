@@ -21,7 +21,7 @@ public class StringLinesScanner extends AbstractScanner implements MultiScanner,
 
     public StringLinesScanner(String text) {
         this.lines = Arrays.stream(text.split("(?:[\\r\\n]|\\\\r|\\\\n)+"))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     @Override

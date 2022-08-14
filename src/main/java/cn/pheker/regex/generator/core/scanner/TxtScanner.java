@@ -34,7 +34,7 @@ public class TxtScanner extends AbstractFileScanner {
             throw new FileException("文件不存在");
         }
     }
-    
+
     @Override
     public void setFilePath(String path) {
         super.setFilePath(path);
@@ -46,7 +46,7 @@ public class TxtScanner extends AbstractFileScanner {
     public int read() {
         return readAndCache();
     }
-    
+
     private int readAndCache() {
         if (c < e) {
             return buf[c++];
@@ -62,27 +62,27 @@ public class TxtScanner extends AbstractFileScanner {
         }
         return EOF;
     }
-    
+
     private int readLineAndCache() {
         if (cacheLine != null && cursor < cacheLine.length()) {
             return cacheLine.charAt(cursor++);
         }
-        
+
         doReadLineIfAbsent();
-        
+
         if (end || cacheLine == null) {
             this.end = true;
             return EOF;
         }
-        
+
         return cacheLine.charAt(cursor++);
     }
-    
+
     private void doReadLineIfAbsent() {
         int i = 0;
         while (!end && (cacheLine == null
-                || cacheLine.length() == 0
-                || cursor == cacheLine.length()
+            || cacheLine.length() == 0
+            || cursor == cacheLine.length()
         ) && i++ < 10) {
             try {
                 cacheLine = reader.readLine();

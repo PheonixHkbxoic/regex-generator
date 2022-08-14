@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2022/8/2 10:19
  * 模型迭代器
  */
-public class ModelIterator implements Iterator<String>{
+public class ModelIterator implements Iterator<String> {
     private List<String> regex;
     private String errorMsg;
     private int cursor = 0;

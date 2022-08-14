@@ -20,40 +20,40 @@ import java.util.stream.Collectors;
 public class StringParagraphsScanner extends AbstractScanner implements Paragraphs, MultiScanner {
     final char SEP = '+';
     final int SEP_MIN_LEN = 5;
-    
+
     boolean trim;
-    
+
     List<Seg> segList;
     int index = 0;
-    
+
     public StringParagraphsScanner(String text) {
         this(text, true);
     }
-    
+
     public StringParagraphsScanner(String text, boolean trim) {
         this.trim = trim;
         this.segList = splitParagraphs(text);
     }
-    
-    
+
+
     @Override
     public String readParagraph() {
         return segList.get(index).text;
     }
-    
+
     @Override
     public List<String> readParagraphs() {
         return segList.stream()
-                .filter(seg -> seg.type == SegType.PARAGRAPH)
-                .map(seg -> seg.text)
-                .collect(Collectors.toList());
+            .filter(seg -> seg.type == SegType.PARAGRAPH)
+            .map(seg -> seg.text)
+            .collect(Collectors.toList());
     }
-    
+
     @Override
     public boolean hasNext() {
         return index < segList.size();
     }
-    
+
     @Override
     public Scanner next() {
         String p = readParagraph();
@@ -62,7 +62,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
             offset += segList.get(i).text.length();
             offsetRow += segList.get(i).rows;
         }
-        
+
         // 查找下一个段落索引
         int index = this.index;
         this.index = segList.size();
@@ -72,7 +72,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
                 break;
             }
         }
-        
+
         if (trim) {
             final Integer m = segList.get(index).valid.getM();
             if (m > 0) {
@@ -87,13 +87,13 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
         }
         return new StringScanner(offset, offsetRow, p);
     }
-    
+
     @Override
     public int read() {
         throw new RuntimeException("StringParagraphsScanner did not support read method");
     }
-    
-    
+
+
     /**
      * 段
      **/
@@ -106,7 +106,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
         IntTuple valid;
         int rows;
     }
-    
+
     /**
      * 段类型
      **/
@@ -115,19 +115,19 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
          * 段落
          **/
         PARAGRAPH,
-        
+
         /**
          * 分隔符
          **/
         SEPARATOR
     }
-    
+
     public List<Seg> splitParagraphs(String text) {
         final int len = text.length();
-        
+
         List<Seg> segList = new ArrayList<>();
         Seg seg = new Seg();
-        
+
         int plus = 0;
         boolean foundLineValidChar = false;
         int blankHead = 0;
@@ -153,7 +153,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
                         blankHead = 0;
                         blankTail = 0;
                     }
-    
+
                     seg.type = SegType.SEPARATOR;
                     seg.text = text.substring(i + 1 - plus, i + 1);
                     seg.rows = 1;
@@ -179,7 +179,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
                 segText.append(c);
             }
         }
-        
+
         // 收尾
         if (plus >= SEP_MIN_LEN) {
             if (segText.length() != 0) {
@@ -190,7 +190,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
                 segList.add(seg);
                 seg = new Seg();
             }
-    
+
             seg.text = text.substring(len - plus, len);
             seg.type = SegType.SEPARATOR;
             seg.rows = 1;
@@ -198,7 +198,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
         } else if (plus > 0) {
             segText.append(StrUtil.times(plus, "+"));
         }
-        
+
         rows++;
         if (segText.length() != 0) {
             seg.type = SegType.PARAGRAPH;
@@ -207,7 +207,7 @@ public class StringParagraphsScanner extends AbstractScanner implements Paragrap
             seg.rows = rows;
             segList.add(seg);
         }
-        
+
         return segList;
     }
 }

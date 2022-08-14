@@ -19,5 +19,5 @@ public interface Lines {
      * 读取所有行
      **/
     List<String> readLines();
-    
+
 }

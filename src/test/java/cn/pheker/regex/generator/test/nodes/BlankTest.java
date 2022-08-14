@@ -22,10 +22,10 @@ public class BlankTest {
     @Test
     public void testBlank() {
         String[] lines = new String[]{
-                " ",
-                "  ",
-                "\t\t",
-                "\r\n\r\n"
+            " ",
+            "  ",
+            "\t\t",
+            "\r\n\r\n"
         };
         final Model model = ModelBuilder.of().build();
         for (String line : lines) {

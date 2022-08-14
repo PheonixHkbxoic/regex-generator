@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class Token {
     public static Token EOF = of(TokenType.EOF, "");
-    
+
     Pos pos;
     TokenType type;
     String tok;
@@ -20,14 +20,14 @@ public class Token {
     public static Token of(TokenType type, char ch) {
         return of(type, String.valueOf(ch));
     }
-    
+
     public static Token of(TokenType type, String tok) {
         Token token = new Token();
         token.type = type;
         token.tok = tok;
         return token;
     }
-    
+
     /**
      * 判断token类型是否是预期的类型
      *
@@ -42,13 +42,13 @@ public class Token {
         }
         return false;
     }
-    
+
     @Override
     public String toString() {
         return String.format("(%s, %s, \"%s\")",
-                pos, type, escapeIfNeed(this));
+            pos, type, escapeIfNeed(this));
     }
-    
+
     /**
      * 对特殊token进行转义处理
      *
@@ -66,7 +66,7 @@ public class Token {
             case DoubleQuote:
                 return token.tok.replaceAll("\"", "\\\\\"");
         }
-        
+
         return token.tok;
     }
 

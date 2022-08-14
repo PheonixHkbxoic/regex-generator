@@ -176,7 +176,7 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         if (!numbers.parse()) {
             numbers.recall();
             this.add(Single.of(this));
-        }else{
+        } else {
             this.add(numbers);
         }
 
@@ -217,11 +217,11 @@ public abstract class AbstractComposite extends NonLeaf implements Alternative {
         // 提早检测  "'嵌套的情况 内层失败
         if (!this.isRoot()) {
             if (type == DoubleQuote
-                    && context.contains(this.parent, Apostrophe)) {
+                && context.contains(this.parent, Apostrophe)) {
                 return ReturnBreak.ofFalse();
             }
             if (type == Apostrophe
-                    && context.contains(this.parent, DoubleQuote)) {
+                && context.contains(this.parent, DoubleQuote)) {
                 return ReturnBreak.ofFalse();
             }
 

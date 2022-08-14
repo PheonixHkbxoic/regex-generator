@@ -16,22 +16,22 @@ public abstract class AbstractNode implements Node {
      * 上下文
      */
     protected transient ThreadLocalModelContext context;
-    
+
     /**
      * 元数据
      */
     protected MetaInfo metaInfo;
-    
+
     /**
      * 节点深度
      */
     protected int deep = 0;
-    
+
     public AbstractNode(NonLeaf parent) {
         this.setParent(parent);
         this.metaInfo = new MetaInfo(this);
     }
-    
+
     @Override
     public void setParent(NonLeaf parent) {
         this.parent = parent;
@@ -42,7 +42,7 @@ public abstract class AbstractNode implements Node {
             this.context = parent.getContext();
         }
     }
-    
+
     @Override
     public MetaInfo getMetaInfo() {
         this.metaInfo.statistics();
@@ -53,32 +53,32 @@ public abstract class AbstractNode implements Node {
     public void setMetaInfo(MetaInfo metaInfo) {
         this.metaInfo = metaInfo;
     }
-    
+
     @Override
     public NonLeaf getParent() {
         return parent;
     }
-    
+
     @Override
     public boolean isRoot() {
         return parent == null;
     }
-    
+
     @Override
     public ThreadLocalModelContext getContext() {
         return context;
     }
-    
+
     @Override
     public void setContext(ThreadLocalModelContext tlmc) {
         this.context = tlmc;
     }
-    
+
     @Override
     public int getDeep() {
         return deep;
     }
-    
+
     /**
      * 默认解析true
      * 对于有状态的节点, 需要重写,自行判断

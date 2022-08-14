@@ -18,7 +18,7 @@ import org.junit.runners.JUnit4;
 @Slf4j
 @RunWith(JUnit4.class)
 public class ModelProofreadTest {
-    
+
     @Before
     public void buildModel() {
         String text = "<div>abc</div>";
@@ -36,6 +36,6 @@ public class ModelProofreadTest {
         final Generator gen = Generator.of(model);
         log.info("after regex: {}", gen.generate());
     }
-    
-    
+
+
 }

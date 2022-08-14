@@ -47,7 +47,7 @@ public enum TokenType {
     GreaterThan(">"),
     QuestionMark("?"),
     At("@"),
-    
+
     // 65-90
     Upper("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
     OpenBracket("["),
@@ -56,26 +56,26 @@ public enum TokenType {
     Caret("^"),
     Underscore("_"),
     BackQuote("`"),
-    
+
     // 97-122
     Lower("abcdefghijklmnopqrstuvwxyz"),
     OpenBrace("{"),
     VerticalBar("|"),
     CloseBrace("}"),
     Tilde("~"),
-    
+
     // 扩展字符
     // 128-255
     Extended(""),
-    
+
     Other("");
-    
+
     String chs;
-    
+
     TokenType(String chs) {
         this.chs = chs;
     }
-    
+
     public static TokenType of(char c) {
         for (TokenType type : values()) {
             if (type.chs.length() > 0 && type.chs.charAt(0) == c) {
@@ -84,7 +84,7 @@ public enum TokenType {
         }
         return null;
     }
-    
+
     public String getChs() {
         return chs;
     }
