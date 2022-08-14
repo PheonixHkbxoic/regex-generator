@@ -2,6 +2,7 @@ package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
 import cn.pheker.regex.generator.core.parser.model.Model;
+import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +18,11 @@ import org.junit.runners.JUnit4;
 @Slf4j
 @RunWith(JUnit4.class)
 public class ModelProofreadTest {
-    Model model = new Model();
     
     @Before
     public void buildModel() {
         String text = "<div>abc</div>";
+        Model model = ModelBuilder.of().build();
         model.proofread(text);
         log.info("before: {}", model.format());
     }
@@ -29,6 +30,7 @@ public class ModelProofreadTest {
     @Test
     public void testProofread() {
         String text = "<p>abc</p>";
+        Model model = ModelBuilder.of().build();
         boolean proofread = model.proofread(text);
         log.info("after: {}", model.format());
         final Generator gen = Generator.of(model);

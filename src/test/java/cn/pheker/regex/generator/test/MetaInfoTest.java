@@ -2,6 +2,7 @@ package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
 import cn.pheker.regex.generator.core.parser.model.Model;
+import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,6 @@ import java.util.List;
 @Slf4j
 @RunWith(JUnit4.class)
 public class MetaInfoTest {
-    Model model = new Model();
     
     @Test
     public void testMetaInfo() {
@@ -29,6 +29,7 @@ public class MetaInfoTest {
                 , "dicp"
                 , "cps"
         );
+        Model model = ModelBuilder.of().build();
         for (String line : lines) {
             boolean proofread = model.proofread(line);
         }

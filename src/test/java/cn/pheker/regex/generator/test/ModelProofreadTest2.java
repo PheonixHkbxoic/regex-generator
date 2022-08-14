@@ -1,7 +1,10 @@
 package cn.pheker.regex.generator.test;
 
 import cn.pheker.regex.generator.core.parser.Generator;
+import cn.pheker.regex.generator.core.parser.GeneratorConfig;
 import cn.pheker.regex.generator.core.parser.model.Model;
+import cn.pheker.regex.generator.core.parser.model.ModelBuilder;
+import cn.pheker.regex.generator.core.parser.other.Mode;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +22,6 @@ import java.util.List;
 @Slf4j
 @RunWith(JUnit4.class)
 public class ModelProofreadTest2 {
-    Model model = new Model();
     
     @Test
     public void testProofread2() {
@@ -33,11 +35,14 @@ public class ModelProofreadTest2 {
                 "civp",
                 "faq"
         );
+        Model model = ModelBuilder.of().build();
         for (String line : lines) {
             boolean proofread = model.proofread(line);
         }
         log.info("after: {}", model.format());
-        final Generator gen = Generator.of(model);
+        GeneratorConfig config = new GeneratorConfig();
+        config.setMode(Mode.Extreme);
+        final Generator gen = Generator.of(model, config);
         log.info("after regex: {}", gen.generate());
     }
     
@@ -49,6 +54,7 @@ public class ModelProofreadTest2 {
 //                "di",
                 "divc"
         );
+        Model model = ModelBuilder.of().build();
         for (String line : lines) {
             boolean proofread = model.proofread(line);
         }
@@ -65,6 +71,7 @@ public class ModelProofreadTest2 {
                 "cv",
                 "dx"
         );
+        Model model = ModelBuilder.of().build();
         for (String line : lines) {
             boolean proofread = model.proofread(line);
         }

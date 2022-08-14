@@ -29,7 +29,10 @@ public class GuoyaozhuiziTest {
         LinesScanner scanner = new LinesScanner(path);
         final Model model = ModelBuilder.of(scanner).build();
         log.info("testGuoyaozhuizi-model: {}", model.format());
-        final List<String> regexList = Generator.of(model).generate();
+        GeneratorConfig config = new GeneratorConfig();
+        config.setMode(Mode.Full);
+        Generator gen = Generator.of(model, config);
+        final List<String> regexList = gen.generate();
         log.info("testGuoyaozhuizi-regexList: {}", regexList);
     }
 
@@ -40,7 +43,7 @@ public class GuoyaozhuiziTest {
         final Model model = ModelBuilder.of(scanner).build();
         log.info("testQueryWordsLib-model: {}", model.format());
         GeneratorConfig config = new GeneratorConfig();
-        config.setMode(Mode.Generate);
+        config.setMode(Mode.Accurate);
         final List<String> regexList = Generator.of(model).generate();
         log.info("testQueryWordsLib-regexList: {}", regexList);
     }

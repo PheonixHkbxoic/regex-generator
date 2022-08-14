@@ -24,7 +24,7 @@ public class Model implements DeepFormat {
     ModelMerger merger;
     ModelInterceptor interceptor;
     
-    public Model() {
+    Model() {
         this.merger = new ModelMerger(this);
     }
     
