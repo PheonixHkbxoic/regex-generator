@@ -36,6 +36,16 @@ public enum Mode {
 
 
     /**
+     * 判断当前级别是否小于指定级别
+     *
+     * @param mode 指定级别
+     * @return 判断当前级别是否小于指定级别
+     */
+    public boolean isLowerThan(Mode mode) {
+        return ordinal() < mode.ordinal();
+    }
+
+    /**
      * 选择两个模式中更高级的模式
      *
      * @param mode1 模式1

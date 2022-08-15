@@ -13,6 +13,7 @@ graph BT
     end
     blank1-->|不是换行|dot
     word-->dot
+    extend-->dot
     other-->dot
 
     subgraph Middle
@@ -37,12 +38,13 @@ graph BT
     digit--> digit1
     chinese-->chinese1
 
-   subgraph Accurate     
+   subgraph Accurate
     blank[空白字符]
     lower[小写字母]
     upper[大写字母]
     digit[数字]
     underscore[下划线]
+    extend[扩展ASCII]
     chinese[中文]
     other[其它]
    end

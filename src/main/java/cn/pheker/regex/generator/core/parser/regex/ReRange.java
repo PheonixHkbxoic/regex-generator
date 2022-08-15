@@ -6,7 +6,7 @@ import cn.pheker.regex.generator.core.parser.regex.abstracts.ReOne;
  * @author cn.pheker
  * @version 1.0.0
  * @date 2022/8/14 21:59
- * @desc
+ * @desc 范围 单字符节点
  */
 public class ReRange extends ReOne {
     private int from;
@@ -42,5 +42,10 @@ public class ReRange extends ReOne {
 
         ReRange reRange = (ReRange) reOne;
         return !(to < reRange.from || reRange.to < from);
+    }
+
+    @Override
+    public boolean contains(int ch) {
+        return from <= ch && ch <= to;
     }
 }
