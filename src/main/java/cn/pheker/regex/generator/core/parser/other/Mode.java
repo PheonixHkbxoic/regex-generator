@@ -5,7 +5,7 @@ package cn.pheker.regex.generator.core.parser.other;
  * @version 1.0
  * @date 2022/8/3 14:26
  * 生成模式:
- * 泛化程度由低到高依次为 精确模式、通用模式、极致模式、完全模式
+ * 泛化程度由低到高依次为 精确模式、低级模式、中级模式、高级模式、完全模式
  * 泛化取决于 模式、分支深度、分支数量、节点类型
  */
 public enum Mode {
@@ -13,23 +13,28 @@ public enum Mode {
      * 精确模式
      **/
     Accurate,
-    
+
     /**
-     * 通用模式
+     * 低级模式
      **/
-    Generate,
-    
+    Low,
+
     /**
-     * 极致模式
+     * 中等模式
      **/
-    Extreme,
-    
+    Middle,
+
+    /**
+     * 高级模式
+     **/
+    High,
+
     /**
      * 完全模式
      **/
     Full;
-    
-    
+
+
     /**
      * 选择两个模式中更高级的模式
      *
@@ -43,7 +48,7 @@ public enum Mode {
         }
         return mode2;
     }
-    
+
     /**
      * 返回泛化程度更高的模式,最高为{@link Mode#Full}
      *
@@ -53,7 +58,7 @@ public enum Mode {
     public static Mode higherMode(Mode mode) {
         return from(mode.ordinal() + 1);
     }
-    
+
     /**
      * 通过ordinal反向查询Mode
      *

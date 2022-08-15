@@ -41,7 +41,7 @@ public class ModelProofreadTest2 {
         }
         log.info("after: {}", model.format());
         GeneratorConfig config = new GeneratorConfig();
-        config.setMode(Mode.Extreme);
+        config.setMode(Mode.High);
         final Generator gen = Generator.of(model, config);
         log.info("after regex: {}", gen.generate());
     }

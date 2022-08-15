@@ -30,7 +30,7 @@ public class PhoneTest {
         Model model = builder.build();
         log.info("model: {}", model.format());
         GeneratorConfig config = new GeneratorConfig();
-        config.setMode(Mode.Generate);
+        config.setMode(Mode.Low);
         final Generator gen = Generator.of(model, config);
         log.info("regex list: {}", gen.generate());
     }

@@ -12,9 +12,9 @@ import lombok.Data;
 @Data
 public class GeneratorConfig {
     /**
-     * 模式
+     * 模式: 默认嘴模式
      */
-    private Mode mode = Mode.Generate;
+    private Mode mode = Mode.Middle;
 
     /**
      * 容错率

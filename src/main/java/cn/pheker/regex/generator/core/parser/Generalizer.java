@@ -4,6 +4,7 @@ import cn.pheker.regex.generator.core.parser.abstracts.Leaf;
 import cn.pheker.regex.generator.core.parser.abstracts.NonLeaf;
 import cn.pheker.regex.generator.core.parser.interfaces.Node;
 import cn.pheker.regex.generator.core.parser.nodes.*;
+import cn.pheker.regex.generator.core.parser.other.DecisionMaker;
 import cn.pheker.regex.generator.core.parser.other.Mode;
 import cn.pheker.regex.generator.misc.IntTuple;
 import lombok.Data;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class Generalizer {
     private Node node;
+    private DecisionMaker decisionMaker;
     private static GeneratorConfig config;
 
     private static String Empty = "";
@@ -96,7 +98,6 @@ public class Generalizer {
     }
 
     private Stack<Wrapper> stack = new Stack<>();
-
     /**
      * 泛化
      *
@@ -107,6 +108,8 @@ public class Generalizer {
     }
 
     private String doGeneralize(Node target) {
+        int maxBranchesDeep = 0;
+
         final Wrapper wrapper = Wrapper.of(target, null);
         stack.push(wrapper);
 
@@ -115,6 +118,10 @@ public class Generalizer {
             if (!w.isFinished()) {
                 stack.push(w);
                 final Node child = w.getChild();
+                if (child.isExtendsOf(Branches.class)) {
+                    w.branchesDeep++;
+                    maxBranchesDeep = Math.max(maxBranchesDeep, w.branchesDeep);
+                }
                 stack.push(Wrapper.of(child, w));
                 continue;
             }
@@ -135,7 +142,7 @@ public class Generalizer {
             } else if (node.isExtendsOf(Branches.class)) {
                 // calc children's item
                 if (w.children.size() > config.getModeUpgradeBranchNum()) {
-                    item.mode = Mode.Generate;
+                    item.mode = Mode.Low;
                 }
                 if (item.times.same()) {
                     item.mode = Mode.Accurate;
@@ -143,15 +150,19 @@ public class Generalizer {
             }
         }
 
+        this.decisionMaker = DecisionMaker.of(maxBranchesDeep);
+        log.info("doGeneralize-decisionMaker: {}", decisionMaker);
+
         Mode rootMode = wrapper.item.mode;
         Mode level = Mode.higherMode(rootMode, config.getMode());
-        wrapper.generalize(level);
+        wrapper.generalize(this.decisionMaker, level);
         return wrapper.getItem().regex;
     }
 
 
     @Data
     public static class Wrapper {
+        private int branchesDeep;
         private Node node;
         private Wrapper parent;
         private List<Wrapper> children;
@@ -165,6 +176,9 @@ public class Generalizer {
 
         public static Wrapper of(Node node, Wrapper parent) {
             final Wrapper wrapper = new Wrapper();
+            if (parent != null) {
+                wrapper.branchesDeep = parent.branchesDeep;
+            }
             wrapper.node = node;
             wrapper.parent = parent;
             wrapper.children = new ArrayList<>();
@@ -186,7 +200,7 @@ public class Generalizer {
             return ((NonLeaf) node).children().get(curr++);
         }
 
-        private void generalize(Mode currMode) {
+        private void generalize(DecisionMaker decisionMaker, Mode currMode) {
             if (node.isLeaf()) {
                 // 查找父级链里最近的Branches
                 Wrapper curr = this;
@@ -218,21 +232,16 @@ public class Generalizer {
             // 剪枝
             this.prune();
 
-            int branchesDeep = this.branchesDeep(node);
-            boolean will = branchesDeep == 0
-                || Mode.Full == currMode && branchesDeep < 2
-                || Mode.Extreme == currMode && branchesDeep < 4
-                || Mode.Generate == currMode && branchesDeep < 6
-                || Mode.Accurate == currMode && branchesDeep < 8
-                || !node.isExtendsOf(Branches.class)
-                || this.node.getParent().getClass().equals(Sequence.class);
+            boolean will = decisionMaker.make(currMode, branchesDeep)
+                || node.isExtendsOf(Sequence.class)
+                || !node.isRoot() && node.getParent().getClass().equals(Sequence.class);
             log.info("branchesDeep: {}, will: {}, node: {},", branchesDeep, will, node);
 
             if (will) {
                 // 子节点泛化
                 for (Wrapper wc : children) {
                     if (!wc.useRegex) {
-                        wc.generalize(Mode.higherMode(currMode, wc.item.mode));
+                        wc.generalize(decisionMaker, Mode.higherMode(currMode, wc.item.mode));
                     }
                 }
             } else {
@@ -539,7 +548,7 @@ public class Generalizer {
                         }
                     }
                     break;
-                case Generate:
+                case Low:
                     // 如 a-z
                     if (chs != null && chs.length() > 0) {
                         final char c = chs.charAt(0);
